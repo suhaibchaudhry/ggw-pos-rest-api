@@ -1,0 +1,22 @@
+<?php
+function pos_api_expose_menu() {
+	//Post Arguments: {request : {uname, pass}}
+	$routers['pos-api/auth'] = array(
+		'title' => 'Authenticate POS Users',
+		'page callback' => 'pos_api_expose_auth',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/auth.route.inc'
+  	);
+
+	return $routers;
+}
+
+function pos_api_expose_respond($response, $die = FALSE) {
+	drupal_set_header('Content-Type: application/json');
+	print json_encode($response);
+
+	if($die) {
+		die();
+	}
+}

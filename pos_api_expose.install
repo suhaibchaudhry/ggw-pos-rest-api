@@ -1,0 +1,35 @@
+<?php
+function pos_api_expose_schema() {
+	$schema = array();
+
+	$schema['pos_api_expose_tokens'] = array(
+		'description' => 'Login tokens for POS API.',
+		'fields' => array(
+			'uid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of the user"
+			),
+			'token' => array(
+				'description' => t('Auth tokens'),
+        		'type' => 'varchar',
+        		'length' => 255,
+        		'not null' => TRUE,
+        		'default' => ''
+			)
+		),
+		'primary key' => array('uid')
+	);
+
+	return $schema;
+}
+
+function pos_api_expose_install() {
+	drupal_install_schema('pos_api_expose');
+}
+
+function pos_api_expose_uninstall() {
+	drupal_uninstall_schema('pos_api_expose');
+}
