@@ -29,6 +29,23 @@ function pos_api_expose_auth() {
 				db_query("REPLACE INTO {pos_api_expose_tokens} VALUES ('%d', '%s')", $user->uid, $token);
 			}
 
+			//Default clock states for user
+			$last_event_clock = last_event($user->uid, 'clock');
+			$last_event_lunch = last_event($user->uid, 'lunch');
+
+			if($last_event_clock->checkin) {
+				$response['clock'] = !(bool)$last_event_clock->checkout;
+			} else {
+				$response['clock'] = false;
+			}
+
+			if($last_event_lunch->checkin) {
+				$response['lunch'] = !(bool)$last_event_lunch->checkout;
+			} else {
+				$response['lunch'] = false;
+			}
+
+			//Send token back on authentication
 			$response['token'] = $token;
 			pos_api_expose_respond($response, true);
 		}

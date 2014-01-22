@@ -20,7 +20,54 @@ function pos_api_expose_schema() {
         		'default' => ''
 			)
 		),
-		'primary key' => array('uid')
+		'primary key' => array('uid'),
+		'indexes' => array(
+    		'auth_token'        => array('token'),
+  		)
+	);
+
+	$schema['pos_api_expose_timesheet'] = array(
+		'description' => 'Store employee timesheet.',
+		'fields' => array(
+			'eid' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'unsigned' => TRUE,
+				'description' => 'The event log id.'
+			),
+			'uid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of the user"
+			),
+			'checkin' => array(
+        		'description' => 'The Unix timestamp when event took place was created.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'big'
+			),
+			'checkout' => array(
+				'description' => 'The Unix timestamp when event took place was created.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'big'
+			),
+			'event_type' => array(
+				'description' => t("Store a daily event time. Valid events are 'clock' and 'lunch'."),
+        		'type' => 'varchar',
+        		'length' => 255,
+        		'not null' => TRUE,
+        		'default' => ''
+			)
+		),
+		'primary key' => array('eid'),
+		'indexes' => array(
+    		'uid'        => array('uid'),
+  		)
 	);
 
 	return $schema;

@@ -9,6 +9,24 @@ function pos_api_expose_menu() {
 		'file' => 'includes/auth.route.inc'
   	);
 
+  	$routers['pos-api/clock'] = array(
+  		'title' => 'Clock RPC',
+  		'description' => 'Clock in or clock out callback for POS Users.',
+		'page callback' => 'pos_api_expose_clock',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/clock.route.inc'
+  	);
+
+  	$routers['pos-api/clockState'] = array(
+  		'title' => 'Clock State RPC',
+  		'description' => 'Query clock state for initial button states on app.',
+		'page callback' => 'pos_api_expose_clockState',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/clock.route.inc'
+  	);
+
 	return $routers;
 }
 
@@ -19,4 +37,7 @@ function pos_api_expose_respond($response, $die = FALSE) {
 	if($die) {
 		die();
 	}
+}
+function last_event($uid, $event_type) {
+	return db_fetch_object(db_query("SELECT eid, checkin, checkout FROM {pos_api_expose_timesheet} WHERE uid = '%d' AND event_type = '%s' ORDER BY checkin DESC", $uid, $event_type));
 }
