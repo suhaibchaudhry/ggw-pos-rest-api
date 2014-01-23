@@ -1,6 +1,7 @@
 <?php
 function pos_api_expose_menu() {
-	//Post Arguments: {request : {uname, pass}}
+	//Post Format: {request : {uname, pass}}
+	//Secure later by changing access arguments to something more role based
 	$routers['pos-api/auth'] = array(
 		'title' => 'Authenticate POS Users',
 		'page callback' => 'pos_api_expose_auth',
@@ -25,6 +26,16 @@ function pos_api_expose_menu() {
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/clock.route.inc'
+  	);
+
+  	$routers['pos-api/products/%'] = array(
+  		'title' => 'Search Products',
+  		'description' => 'Search for products by name or sku.',
+		'page callback' => 'pos_api_expose_product_search',
+		'access arguments' => array('access content'),
+		'page arguments' => array(2),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/products.route.inc'
   	);
 
 	return $routers;
