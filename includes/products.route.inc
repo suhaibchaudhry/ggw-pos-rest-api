@@ -13,8 +13,6 @@ function pos_api_expose_product_search($query) {
 
 		$uid = db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
 		if($uid) {
-			
-
 			pos_api_expose_respond($response, true);
 		}
 	}
@@ -22,20 +20,16 @@ function pos_api_expose_product_search($query) {
 	pos_api_expose_respond($failed_response);
 	*/
 
-	$sku_sql = "SELECT n.nid, n.title, p.model, p.list_price, p.sell_price FROM {uc_products} p
-			INNER JOIN {node} n ON n.vid = p.vid
-			INNER JOIN {node_revisions} nv ON nv.vid = n.vid
-			WHERE p.model LIKE '%s%%'
-			LIMIT 0, 15";
+	$sku_sql = "SELECT p.vid FROM {uc_products} p WHERE p.model LIKE '%s%%'";
 
-	$search_sql = "SELECT n.nid, n.title, p.model, p.list_price, p.sell_price FROM {uc_products} p
-			INNER JOIN {node} n ON n.vid = p.vid
-			INNER JOIN {node_revisions} nv ON nv.vid = n.vid
-			INNER JOIN (SELECT nv.nid, nv.vid, nv.title FROM {node_revisions} nv
-					   WHERE MATCH(title) AGAINST ('%s')) AS search ON n.vid = search.vid
-			LIMIT 0, 15";
+	$fulltext_sql = "SELECT nv.vid FROM {node_revisions} nv
+					 WHERE MATCH(nv.title) AGAINST ('%s')";
 
-	$sql = $sku_sql.' UNION '.$search_sql;
+	$sql = 'SELECT n.nid, n.title, p.model, p.list_price, p.sell_price
+			FROM {uc_products} p
+			INNER JOIN {node} n ON n.vid = p.vid
+			WHERE n.vid IN ('.$sku_sql.' UNION '.$fulltext_sql.')
+			ORDER BY n.title ASC';
 
 	$dataset = array();
 
