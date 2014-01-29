@@ -1,8 +1,5 @@
 <?php
-function pos_api_expose_product_search($query, $token) {
-	//dpm($query);
-	//dpm($token);
-	//watchdog('pos api expose', 'query: '.$query.' token: '.$token);
+function pos_api_expose_product_search($token, $query) {
 	if(!empty($token)) {
 		$uid = db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
 		if($uid) {
