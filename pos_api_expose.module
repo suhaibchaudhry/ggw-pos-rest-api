@@ -28,12 +28,12 @@ function pos_api_expose_menu() {
 		'file' => 'includes/clock.route.inc'
   	);
 
-  	$routers['pos-api/products/%'] = array(
+  	$routers['pos-api/products/%/%'] = array(
   		'title' => 'Search Products',
   		'description' => 'Search for products by name or sku.',
 		'page callback' => 'pos_api_expose_product_search',
 		'access arguments' => array('access content'),
-		'page arguments' => array(2),
+		'page arguments' => array(2, 3),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/products.route.inc'
   	);
