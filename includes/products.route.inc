@@ -1,4 +1,14 @@
 <?php
+function _pos_api_expose_load_special_prices($vid) {
+	$prices = array();
+	$role_prices = db_query("SELECT rid, price FROM {uc_price_per_role_prices} WHERE vid = '%d'", $vid);
+	while($role_price = db_fetch_object($role_prices)) {
+		$prices[] = array('role' => $role_price->rid, 'price' => $role_price->price);
+	}
+
+	return $prices;
+}
+
 function pos_api_expose_product_search($token, $query) {
 	if(!empty($token)) {
 		$uid = db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
@@ -12,11 +22,12 @@ function pos_api_expose_product_search($token, $query) {
 							  ctp.field_prod_unit_barcode_value LIKE '%s%%' OR
 							  p.vid IN (".$additional_barcode_sql.")";
 
-			$fulltext_sql = "SELECT nv.vid, MATCH(nv.title) AGAINST ('%s') AS relevance FROM {node_revisions} nv
+			$fulltext_sql = "SELECT nv.vid, MATCH(nv.title) AGAINST ('%s') AS relevance
+							 FROM {node_revisions} nv
 							 HAVING relevance > 0";
 
 			//UNION ALL appears to be significantly faster than UNION.
-			$sql = 'SELECT n.nid, n.title, p.model, p.list_price, p.sell_price, f.filepath
+			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath
 					FROM {uc_products} p
 					INNER JOIN {node} n ON n.vid = p.vid
 
@@ -37,12 +48,14 @@ function pos_api_expose_product_search($token, $query) {
 				}
 
 				$dataset[] = array(
-					'nid' => $item->nid,
+					'id' => $item->nid,
 					'sku' => $item->model,
 					'list_price' => $item->list_price,
 					'sell_price' => $item->sell_price,
+					'special_prices' => _pos_api_expose_load_special_prices($item->vid),
 					'name' => trim($item->title),
-					'image' => imagecache_create_url('product_grid_slim', $item->filepath)
+					'image' => imagecache_create_url('pos_client_search', $item->filepath),
+					'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath)
 				);
 			}
 
