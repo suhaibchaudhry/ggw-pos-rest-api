@@ -38,6 +38,16 @@ function pos_api_expose_menu() {
 		'file' => 'includes/products.route.inc'
   	);
 
+  	$routers['pos-api/customers/%/%'] = array(
+  		'title' => 'Search Customers',
+  		'description' => 'Search for customer by company name, number, address or other field keywords.',
+		'page callback' => 'pos_api_expose_customer_search',
+		'access arguments' => array('access content'),
+		'page arguments' => array(2, 3),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/customers.route.inc'
+  	);
+
 	return $routers;
 }
 
