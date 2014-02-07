@@ -49,7 +49,7 @@ function pos_api_expose_customer_search($token, $query) {
 					search ON search.vid = n.vid
 					WHERE n.type = 'profile'
 					ORDER BY search.relevance DESC
-					LIMIT 0, 13";
+					LIMIT 0, 8";
 
 			$dataset = array();
 			$items = db_query($sql, $query, $query, $query, $query, $query, $query);
