@@ -38,7 +38,7 @@ function pos_api_expose_customer_search($token, $query) {
 					ctp.field_company_address_street2, '\n',
 					ctp.field_company_address_city, ', ',
 					ctp.field_company_address_state, ' ',
-					ctp.field_company_address_zip) AS company_address,
+					ctp.field_company_address_zip) AS company_address
 
 					FROM node n
 					INNER JOIN users u ON n.uid = u.uid
