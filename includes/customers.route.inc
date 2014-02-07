@@ -1,4 +1,15 @@
 <?php
+function _pos_api_expose_get_roles($uid) {
+	$user_roles = array();
+	$sql = "SELECT rid FROM {users_roles} ur WHERE ur.uid = '%d'";
+	$roles = db_query($sql, $uid);
+	while($role = db_fetch_object($roles)) {
+		$user_roles[] = $role->rid; 
+	}
+
+	return $user_roles;
+}
+
 function pos_api_expose_customer_search($token, $query) {
 	if(!empty($token)) {
 		$uid = db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
@@ -61,7 +72,8 @@ function pos_api_expose_customer_search($token, $query) {
 					'company_name' => $item->title,
 					'company_phone' => $item->field_profile_company_phone_number,
 					'agent_phone' => $item->field_profile_phone_number,
-					'company_address' => $item->company_address
+					'company_address' => $item->company_address,
+					'roles' => _pos_api_expose_get_roles($item->uid)
 				);
 			}
 
