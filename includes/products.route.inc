@@ -79,7 +79,7 @@ function pos_api_expose_product_scan() {
 	if(array_key_exists('request', $_POST)) {
 		$request = json_decode($_POST['request']);
 		$token = $request->token;
-		$barcode = $request->barcode;
+		$barcode = trim($request->barcode);
 
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
