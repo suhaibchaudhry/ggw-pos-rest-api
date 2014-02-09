@@ -30,8 +30,8 @@ function pos_api_expose_auth() {
 			}
 
 			//Default clock states for user
-			$last_event_clock = last_event($user->uid, 'clock');
-			$last_event_lunch = last_event($user->uid, 'lunch');
+			$last_event_clock = _pos_api_expose_last_event($user->uid, 'clock');
+			$last_event_lunch = _pos_api_expose_last_event($user->uid, 'lunch');
 
 			if($last_event_clock->checkin) {
 				$response['clock'] = !(bool)$last_event_clock->checkout;

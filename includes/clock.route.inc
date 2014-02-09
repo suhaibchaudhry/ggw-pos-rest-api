@@ -1,6 +1,5 @@
 <?php
 function pos_api_expose_clockState() {
-	$request = json_decode($_POST['request']);
 	$failed_response = array(
 		'clock' => false,
 		'lunch' => false
@@ -10,13 +9,13 @@ function pos_api_expose_clockState() {
 		$request = json_decode($_POST['request']);
 		$token = $request->token;
 
-		$uid = db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
+		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
-			$last_event = last_event($uid, $event_type);
+			$last_event = _pos_api_expose_last_event($uid, $event_type);
 
 			//Default clock states for user
-			$last_event_clock = last_event($uid, 'clock');
-			$last_event_lunch = last_event($uid, 'lunch');
+			$last_event_clock = _pos_api_expose_last_event($uid, 'clock');
+			$last_event_lunch = _pos_api_expose_last_event($uid, 'lunch');
 
 			$response = array();
 			
@@ -40,7 +39,6 @@ function pos_api_expose_clockState() {
 }
 
 function pos_api_expose_clock() {
-	$request = json_decode($_POST['request']);
 	$failed_response = array(
 		'checkin' => false,
 		'error' => 'Provided login information is incorrect.'
@@ -51,10 +49,10 @@ function pos_api_expose_clock() {
 		$token = $request->token;
 		$event_type = $request->event_type;
 
-		$uid = db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
+		$uid = _pos_api_expose_uid_from_token($token);
 		
 		if($uid) {
-			$last_event = last_event($uid, $event_type);
+			$last_event = _pos_api_expose_last_event($uid, $event_type);
 
 			if(!empty($last_event->checkin) && empty($last_event->checkout)) {
 				db_query("UPDATE {pos_api_expose_timesheet} SET checkout = '%s' WHERE eid = '%d'", time(), $last_event->eid);

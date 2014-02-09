@@ -28,6 +28,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/clock.route.inc'
   	);
 
+  	$routers['pos-api/product-scan'] = array(
+  		'title' => 'Scan Product Barcode',
+  		'description' => 'Search for products by a barcode.',
+		'page callback' => 'pos_api_expose_product_scan',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/products.route.inc'
+  	);
+
   	$routers['pos-api/products/%/%'] = array(
   		'title' => 'Search Products',
   		'description' => 'Search for products by name or sku.',
@@ -59,6 +68,10 @@ function pos_api_expose_respond($response, $die = FALSE) {
 		die();
 	}
 }
-function last_event($uid, $event_type) {
+function _pos_api_expose_last_event($uid, $event_type) {
 	return db_fetch_object(db_query("SELECT eid, checkin, checkout FROM {pos_api_expose_timesheet} WHERE uid = '%d' AND event_type = '%s' ORDER BY checkin DESC", $uid, $event_type));
+}
+
+function _pos_api_expose_uid_from_token($token) {
+	return db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
 }

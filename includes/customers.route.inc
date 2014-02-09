@@ -12,7 +12,7 @@ function _pos_api_expose_get_roles($uid) {
 
 function pos_api_expose_customer_search($token, $query) {
 	if(!empty($token)) {
-		$uid = db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
+		$uid = _pos_api_expose_uid_from_token($token);
 
 		if($uid) {
 			//By Search Company Name with Fluid Revelevance
