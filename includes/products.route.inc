@@ -14,6 +14,7 @@ function _pos_api_expose_map_datum($item) {
 		'id' => $item->nid,
 		'sku' => $item->model,
 		'list_price' => $item->list_price,
+		'packaging' => $item->field_prod_packing_value,
 		'sell_price' => $item->sell_price,
 		'special_prices' => _pos_api_expose_load_special_prices($item->vid),
 		'name' => trim($item->title),
@@ -40,12 +41,13 @@ function pos_api_expose_product_search($token, $query) {
 							 HAVING relevance > 0";
 
 			//UNION ALL appears to be significantly faster than UNION.
-			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath
+			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value
 					FROM {uc_products} p
 					INNER JOIN {node} n ON n.vid = p.vid
 
 					LEFT JOIN {content_field_image_cache} cfic ON n.vid = cfic.vid
 					LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
+					LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
 
 					INNER JOIN (('.$sku_sql.') UNION ALL ('.$fulltext_sql.')) fts ON n.vid = fts.vid
 
@@ -92,12 +94,13 @@ function pos_api_expose_product_scan() {
 							  ctp.field_prod_unit_barcode_value = '%s' OR
 							  p.vid IN (".$additional_barcode_sql.")";
 
-			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath
+			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value
 					FROM {uc_products} p
 					INNER JOIN {node} n ON n.vid = p.vid
 
 					LEFT JOIN {content_field_image_cache} cfic ON n.vid = cfic.vid
 					LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
+					LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
 
 					WHERE p.vid IN ('.$sku_sql.')
 					LIMIT 0, 1';
