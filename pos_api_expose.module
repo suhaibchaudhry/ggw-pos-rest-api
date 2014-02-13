@@ -46,6 +46,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/new-ticket'] = array(
+  		'title' => 'New Ticket',
+  		'description' => 'Create a new ticket and get ticketId.',
+		'page callback' => 'pos_api_expose_new_ticket',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
   	$routers['pos-api/products/%/%'] = array(
   		'title' => 'Search Products',
   		'description' => 'Search for products by name or sku.',
