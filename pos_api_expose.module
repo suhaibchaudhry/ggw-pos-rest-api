@@ -55,6 +55,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/ticket/update-customer'] = array(
+  		'title' => 'Update Ticket Customer',
+  		'description' => 'Update customer on a ticket.',
+		'page callback' => 'pos_api_expose_ticket_update_customer',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
   	$routers['pos-api/products/%/%'] = array(
   		'title' => 'Search Products',
   		'description' => 'Search for products by name or sku.',
@@ -71,6 +80,15 @@ function pos_api_expose_menu() {
 		'page callback' => 'pos_api_expose_customer_search',
 		'access arguments' => array('access content'),
 		'page arguments' => array(2, 3),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/customers.route.inc'
+  	);
+
+  	$routers['pos-api/customer'] = array(
+  		'title' => 'Search Customers',
+  		'description' => 'Search for customer by customer uid, number, address or other field keywords.',
+		'page callback' => 'pos_api_expose_get_customer',
+		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/customers.route.inc'
   	);

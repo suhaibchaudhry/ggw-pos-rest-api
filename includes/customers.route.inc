@@ -10,6 +10,57 @@ function _pos_api_expose_get_roles($uid) {
 	return $user_roles;
 }
 
+function _pos_api_expose_map_customer_datum($item) {
+	return array(
+				'id' => $item->uid,
+				'account_id' => $item->name,
+				'company_name' => $item->title,
+				'company_phone' => $item->field_profile_company_phone_number,
+				'agent_phone' => $item->field_profile_phone_number,
+				'company_address' => $item->company_address,
+				'roles' => _pos_api_expose_get_roles($item->uid)
+			);
+}
+
+function pos_api_expose_get_customer() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not load customer.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$token = $request->token;
+		$customerUid = $request->customerUid;
+
+		$uid = _pos_api_expose_uid_from_token($token);
+		if($uid) {
+			$sql = "SELECT u.uid, n.title, u.name,
+
+					ctp.field_profile_company_phone_number,
+					ctp.field_profile_phone_number,
+
+					CONCAT(ctp.field_company_address_street1, ' ',
+					ctp.field_company_address_street2, '\n',
+					ctp.field_company_address_city, ', ',
+					ctp.field_company_address_state, ' ',
+					ctp.field_company_address_zip) AS company_address
+
+					FROM node n
+					INNER JOIN users u ON n.uid = u.uid
+					INNER JOIN content_type_profile ctp ON ctp.vid = n.vid
+					WHERE u.uid = '%d' AND n.type = 'profile'";
+
+			$item = db_fetch_object(db_query($sql, $customerUid));
+			$user = _pos_api_expose_map_customer_datum($item);
+
+			pos_api_expose_respond(array('status' => true, 'customer' => $user), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_customer_search($token, $query) {
 	if(!empty($token)) {
 		$uid = _pos_api_expose_uid_from_token($token);
@@ -66,15 +117,7 @@ function pos_api_expose_customer_search($token, $query) {
 			$items = db_query($sql, $query, $query, $query, $query, $query, $query);
 
 			while($item = db_fetch_object($items)) {
-				$dataset[] = array(
-					'id' => $item->uid,
-					'account_id' => $item->name,
-					'company_name' => $item->title,
-					'company_phone' => $item->field_profile_company_phone_number,
-					'agent_phone' => $item->field_profile_phone_number,
-					'company_address' => $item->company_address,
-					'roles' => _pos_api_expose_get_roles($item->uid)
-				);
+				$dataset[] = _pos_api_expose_map_customer_datum($item);
 			}
 
 			pos_api_expose_respond($dataset, true);

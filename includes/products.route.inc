@@ -9,7 +9,7 @@ function _pos_api_expose_load_special_prices($vid) {
 	return $prices;
 }
 
-function _pos_api_expose_map_datum($item) {
+function _pos_api_expose_map_product_datum($item) {
 	return array(
 		'id' => $item->nid,
 		'sku' => $item->model,
@@ -62,7 +62,7 @@ function pos_api_expose_product_search($token, $query) {
 					$item->filepath = 'sites/general-goods.com/files/imagefield_default_images/notfound_0.png';
 				}
 
-				$dataset[] = _pos_api_expose_map_datum($item);
+				$dataset[] = _pos_api_expose_map_product_datum($item);
 			}
 
 			pos_api_expose_respond($dataset, true);
@@ -107,7 +107,7 @@ function pos_api_expose_product_scan() {
 
 			$product = db_fetch_object(db_query($sql, $barcode, $barcode, $barcode));
 
-			$datum = _pos_api_expose_map_datum($product);
+			$datum = _pos_api_expose_map_product_datum($product);
 
 			if($product) {
 				$response = array(

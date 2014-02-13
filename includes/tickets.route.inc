@@ -58,7 +58,32 @@ function pos_api_expose_new_ticket() {
 			drupal_write_record('uc_orders', $order);
 			pos_api_expose_respond(array('status' => true,
 										 'ticketId' => $order->order_id,
-										 'ticketStatus' =>$order->order_status), true);
+										 'ticketStatus' =>$order->order_status,
+										 'customerUid' => $order->uid), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
+function pos_api_expose_ticket_update_customer() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not update a ticket.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$customerUid = $request->customerUid;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			if($ticketId) {
+				db_query("UPDATE {uc_orders} SET uid = '%d' WHERE order_id = '%d'", $customerUid, $ticketId);
+			}
+
+			pos_api_expose_respond(array('status' => true, 'message' => 'Customer id has been set.'), true);
 		}
 	}
 
