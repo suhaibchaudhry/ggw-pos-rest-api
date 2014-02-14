@@ -64,6 +64,16 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/tickets/%/%'] = array(
+  		'title' => 'Search Tickets',
+  		'description' => 'Search for tickets by ticket id or customer info.',
+		'page callback' => 'pos_api_expose_ticket_search',
+		'access arguments' => array('access content'),
+		'page arguments' => array(2, 3),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
   	$routers['pos-api/products/%/%'] = array(
   		'title' => 'Search Products',
   		'description' => 'Search for products by name or sku.',

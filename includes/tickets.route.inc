@@ -89,3 +89,56 @@ function pos_api_expose_ticket_update_customer() {
 
 	pos_api_expose_respond($failed_response);
 }
+
+function pos_api_expose_ticket_search($token, $query) {
+	if(!empty($token)) {
+		$uid = _pos_api_expose_uid_from_token($token);
+
+		if($uid) {
+			//By Search Company Name with Fluid Revelevance
+			$fulltext_sql = "SELECT nv.vid, MATCH(nv.title) AGAINST ('%s') AS relevance
+							 FROM {node_revisions} nv
+							 HAVING relevance > 0";
+
+			//Search by Account ID
+			$accountid_search = "SELECT n.vid, 10 AS relevance
+								 FROM node n
+								 INNER JOIN users u ON n.uid = u.uid
+								 WHERE u.name LIKE '%s%%'";
+
+			//Search by Phone Number
+			$phone_searches = "SELECT ctp.vid, 9 AS relevance
+							   FROM content_type_profile ctp
+							   WHERE ctp.field_profile_company_phone_number LIKE '%s%%' OR
+							   ctp.field_profile_phone_number LIKE '%s%%'";
+
+			//Get all possible customers form search query.
+			$ticket_customers = "SELECT u.uid
+					FROM node n
+					INNER JOIN users u ON n.uid = u.uid
+					INNER JOIN ((".$fulltext_sql.") UNION (".$accountid_search.") UNION (".$phone_searches."))
+					search ON search.vid = n.vid
+					WHERE n.type = 'profile'";
+
+			$sql = "SELECT order_id, uid, order_status, os.title AS order_status_en
+					FROM uc_orders uo
+					INNER JOIN uc_order_statuses os ON uo.order_status = os.order_status_id
+					WHERE uo.uid IN (".$ticket_customers.") OR uo.order_id LIKE '%s%%'
+					ORDER BY uo.modified DESC";
+
+			$dataset = array();
+			$items = db_query($sql, $query, $query, $query, $query, $query);
+
+			while($item = db_fetch_object($items)) {
+				$dataset[] = array('ticketId' => $item->order_id,
+										 'ticketStatus' => $item->order_status,
+										 'ticketStatus_en' => $item->order_status_en,
+										 'customerUid' => $item->uid);
+			}
+
+			pos_api_expose_respond($dataset, true);
+		}
+	}
+
+	pos_api_expose_respond(array());
+}
