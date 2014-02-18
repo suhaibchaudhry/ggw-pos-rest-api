@@ -142,3 +142,40 @@ function pos_api_expose_ticket_search($token, $query) {
 
 	pos_api_expose_respond(array());
 }
+
+function pos_api_expose_ticket_add_product() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not add product to ticket.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+
+		if($uid) {
+			$order_product = new stdClass();
+			$order_product->order_id = $request->ticketId;
+			$order_product->nid = $request->productId;
+			$order_product->title = $request->name;
+			$order_product->model = $request->sku;
+			$order_product->price = $request->price;
+
+			$order_product->cost = 0;
+			$order_product->manufacturer = '';
+			$order_product->weight = 0;
+			$order_product->qty = 1;
+			$order_product->data = array(
+				'attributes' => array()
+			);
+
+			drupal_write_record('uc_order_products', $order_product);
+
+			pos_api_expose_respond(array('status' => true,
+										 'ticketProductId' => $order->order_product_id), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}

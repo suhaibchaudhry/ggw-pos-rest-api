@@ -1,5 +1,5 @@
 name = POS API Expose
 description = Expose a RESTfull API for DyArtLabs NodeJS based point of sale system.
-package = GGW Custom Modules
+package = General Goods POS
 dependencies[] = similar
 core = 6.x
