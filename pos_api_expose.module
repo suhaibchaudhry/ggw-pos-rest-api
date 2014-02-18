@@ -55,6 +55,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/load-ticket'] = array(
+  		'title' => 'Load Ticket Products',
+  		'description' => 'Load products from an existing ticketId.',
+		'page callback' => 'pos_api_expose_load_ticket_products',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/products.route.inc'
+  	);
+
   	$routers['pos-api/ticket/update-customer'] = array(
   		'title' => 'Update Ticket Customer',
   		'description' => 'Update customer on a ticket.',

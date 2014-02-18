@@ -10,6 +10,10 @@ function _pos_api_expose_load_special_prices($vid) {
 }
 
 function _pos_api_expose_map_product_datum($item) {
+	if(empty($item->filepath)) {
+		$item->filepath = 'sites/general-goods.com/files/imagefield_default_images/notfound_0.png';
+	}
+
 	return array(
 		'id' => $item->nid,
 		'sku' => $item->model,
@@ -19,7 +23,8 @@ function _pos_api_expose_map_product_datum($item) {
 		'special_prices' => _pos_api_expose_load_special_prices($item->vid),
 		'name' => trim($item->title),
 		'image' => imagecache_create_url('pos_client_search', $item->filepath),
-		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath)
+		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath),
+		'qty' => 1
 	);
 }
 
@@ -58,10 +63,6 @@ function pos_api_expose_product_search($token, $query) {
 
 			$items = db_query($sql, $query, $query, $query, $query);
 			while($item = db_fetch_object($items)) {
-				if(empty($item->filepath)) {
-					$item->filepath = 'sites/general-goods.com/files/imagefield_default_images/notfound_0.png';
-				}
-
 				$dataset[] = _pos_api_expose_map_product_datum($item);
 			}
 
@@ -70,6 +71,44 @@ function pos_api_expose_product_search($token, $query) {
 	}
 
 	pos_api_expose_respond(array());
+}
+
+function pos_api_expose_load_ticket_products() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not load ticket products.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$token = $request->token;
+		$ticketId = $request->ticketId;
+
+		$uid = _pos_api_expose_uid_from_token($token);
+		if($uid) {
+			$ticketSql = "SELECT nid FROM uc_order_products WHERE order_id = '%d'";
+
+			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value
+					FROM {uc_products} p
+					INNER JOIN {node} n ON n.vid = p.vid
+
+					LEFT JOIN {content_field_image_cache} cfic ON n.vid = cfic.vid
+					LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
+					LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
+
+					WHERE n.nid IN ('.$ticketSql.')';
+
+		    $items = db_query($sql, $ticketId);
+			$dataset = array();
+			while($item = db_fetch_object($items)) {
+				$dataset[] = _pos_api_expose_map_product_datum($item);
+			}	
+
+			pos_api_expose_respond(array('status' => true, 'products' => $dataset), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
 }
 
 function pos_api_expose_product_scan() {
