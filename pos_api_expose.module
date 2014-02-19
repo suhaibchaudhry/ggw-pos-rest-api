@@ -73,6 +73,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/ticket/get-current'] = array(
+  		'title' => 'Update Ticket Customer',
+  		'description' => 'Get current ticket to patch dirty caches on typeaheadjs.',
+		'page callback' => 'pos_api_expose_ticket_current',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
   	$routers['pos-api/ticket/add-product'] = array(
   		'title' => 'Add Product to Ticket',
   		'description' => 'Add a product to ticket.',

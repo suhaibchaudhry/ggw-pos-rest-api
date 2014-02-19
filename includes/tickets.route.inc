@@ -90,6 +90,34 @@ function pos_api_expose_ticket_update_customer() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_ticket_current() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not get ticket current customer.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			$sql = "SELECT uo.order_id, uo.uid, uo.order_status, os.title AS order_status_en
+					FROM uc_orders uo
+					INNER JOIN uc_order_statuses os ON uo.order_status = os.order_status_id
+					WHERE uo.order_id = '%d'";
+			$item = db_fetch_object(db_query($sql, $ticketId));
+			pos_api_expose_respond(array('status' => true,
+				'ticket' => array('ticketId' => $item->order_id,
+										 'status' => $item->order_status,
+										 'status_en' => $item->order_status_en,
+										 'customerUid' => $item->uid)), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_ticket_search($token, $query) {
 	if(!empty($token)) {
 		$uid = _pos_api_expose_uid_from_token($token);
