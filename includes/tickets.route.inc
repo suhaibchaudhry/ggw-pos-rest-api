@@ -233,3 +233,25 @@ function pos_api_expose_ticket_add_product() {
 
 	pos_api_expose_respond($failed_response);
 }
+
+function pos_api_expose_ticket_remove_product() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not remove product from ticket.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$productId = $request->productId;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			db_query("DELETE FROM {uc_order_products} WHERE order_id = '%d' AND nid = '%d'", $ticketId, $productId);
+			pos_api_expose_respond(array('status' => true,
+										 'message' => 'Ticket product removed.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}

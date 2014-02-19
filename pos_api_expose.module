@@ -100,6 +100,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/ticket/remove-product'] = array(
+  		'title' => 'Remove Product from Ticket',
+  		'description' => 'Remove a product from ticket.',
+		'page callback' => 'pos_api_expose_ticket_remove_product',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
   	$routers['pos-api/tickets/%/%'] = array(
   		'title' => 'Search Tickets',
   		'description' => 'Search for tickets by ticket id or customer info.',
