@@ -67,6 +67,7 @@ function pos_api_expose_new_ticket() {
 }
 
 function pos_api_expose_ticket_update_customer() {
+	//Todo: update prices on database based on user role using data from special price module.
 	$failed_response = array(
 		'status' => false,
 		'error' => 'Could not update a ticket.'
@@ -84,6 +85,31 @@ function pos_api_expose_ticket_update_customer() {
 			}
 
 			pos_api_expose_respond(array('status' => true, 'message' => 'Customer id has been set.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
+function pos_api_expose_ticket_update_product_qty() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not update a ticket product quantity.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$productId = $request->productId;
+		$qty = $request->qty;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			if($ticketId) {
+				db_query("UPDATE {uc_order_products} SET qty = '%d' WHERE order_id = '%d' AND nid = '%d'", $qty, $ticketId, $productId);
+			}
+
+			pos_api_expose_respond(array('status' => true, 'message' => 'Product qty updated.'), true);
 		}
 	}
 

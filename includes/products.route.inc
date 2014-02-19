@@ -14,7 +14,7 @@ function _pos_api_expose_map_product_datum($item) {
 		$item->filepath = 'sites/general-goods.com/files/imagefield_default_images/notfound_0.png';
 	}
 
-	return array(
+	$product = array(
 		'id' => $item->nid,
 		'sku' => $item->model,
 		'list_price' => $item->list_price,
@@ -23,9 +23,14 @@ function _pos_api_expose_map_product_datum($item) {
 		'special_prices' => _pos_api_expose_load_special_prices($item->vid),
 		'name' => trim($item->title),
 		'image' => imagecache_create_url('pos_client_search', $item->filepath),
-		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath),
-		'qty' => 1
+		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath)
 	);
+
+	if(!empty($item->qty)) {
+		$product['qty'] = (int)$item->qty;
+	}
+
+	return $product;
 }
 
 function pos_api_expose_product_search($token, $query) {
@@ -86,9 +91,9 @@ function pos_api_expose_load_ticket_products() {
 
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
-			$ticketSql = "SELECT nid FROM uc_order_products WHERE order_id = '%d'";
+			$ticketSql = "SELECT nid, qty FROM {uc_order_products} WHERE order_id = '%d'";
 
-			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value
+			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, ts.qty
 					FROM {uc_products} p
 					INNER JOIN {node} n ON n.vid = p.vid
 
@@ -96,7 +101,7 @@ function pos_api_expose_load_ticket_products() {
 					LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
 					LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
 
-					WHERE n.nid IN ('.$ticketSql.')';
+					INNER JOIN ('.$ticketSql.') ts ON ts.nid = n.nid';
 
 		    $items = db_query($sql, $ticketId);
 			$dataset = array();
