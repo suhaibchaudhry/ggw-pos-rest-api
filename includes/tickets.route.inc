@@ -42,7 +42,7 @@ function pos_api_expose_new_ticket() {
 
 			$order = new stdClass();
 			$order->uid = 0;
-			$order->order_status = 'pos_in_progress';
+			$order->order_status = 'pos_quote'; //Open New ticket as a quote ticket
 			$order->order_total = 0;
 			$order->product_count = 0;
 			$order->delivery_zone = 0;
@@ -320,6 +320,28 @@ function pos_api_expose_ticket_update_zone() {
 			db_query("UPDATE {uc_orders} SET data = '%s' WHERE order_id = '%d'", serialize(array('zone' => 1)), $ticketId);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket delivery zone updated.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
+function pos_api_expose_ticket_update_status() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not update status on ticket.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$ticketStatus = $request->ticketStatus;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			db_query("UPDATE {uc_orders} SET order_status = '%s' WHERE order_id = '%d'", $ticketStatus, $ticketId);
+			pos_api_expose_respond(array('status' => true,
+										 'message' => 'Ticket status updated.'), true);
 		}
 	}
 
