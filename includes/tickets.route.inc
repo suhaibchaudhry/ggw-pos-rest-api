@@ -255,3 +255,26 @@ function pos_api_expose_ticket_remove_product() {
 
 	pos_api_expose_respond($failed_response);
 }
+
+function pos_api_expose_ticket_update_totals() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not remove totals on ticket.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$total = $request->total;
+		$product_count = $request->productCount;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			db_query("UPDATE {uc_orders} SET order_total = '%f', product_count = '%d' WHERE order_id = '%d'", $total, $product_count, $ticketId);
+			pos_api_expose_respond(array('status' => true,
+										 'message' => 'Ticket totals updated.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}

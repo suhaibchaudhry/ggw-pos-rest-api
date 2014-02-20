@@ -109,6 +109,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/ticket/update-total'] = array(
+  		'title' => 'Update Ticket Totals',
+  		'description' => 'Update a ticket totals.',
+		'page callback' => 'pos_api_expose_ticket_update_totals',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
   	$routers['pos-api/tickets/%/%'] = array(
   		'title' => 'Search Tickets',
   		'description' => 'Search for tickets by ticket id or customer info.',
