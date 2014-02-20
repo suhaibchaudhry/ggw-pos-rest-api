@@ -285,7 +285,7 @@ function pos_api_expose_ticket_remove_product() {
 function pos_api_expose_ticket_update_totals() {
 	$failed_response = array(
 		'status' => false,
-		'error' => 'Could not remove totals on ticket.'
+		'error' => 'Could not update totals on ticket.'
 	);
 
 	if(array_key_exists('request', $_POST)) {
@@ -299,6 +299,27 @@ function pos_api_expose_ticket_update_totals() {
 			db_query("UPDATE {uc_orders} SET order_total = '%f', product_count = '%d' WHERE order_id = '%d'", $total, $product_count, $ticketId);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket totals updated.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
+function pos_api_expose_ticket_update_zone() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not update delivery zone on ticket.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			db_query("UPDATE {uc_orders} SET data = '%s' WHERE order_id = '%d'", serialize(array('zone' => 1)), $ticketId);
+			pos_api_expose_respond(array('status' => true,
+										 'message' => 'Ticket delivery zone updated.'), true);
 		}
 	}
 
