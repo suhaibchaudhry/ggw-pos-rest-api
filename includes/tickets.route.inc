@@ -82,6 +82,32 @@ function pos_api_expose_ticket_update_customer() {
 		if($uid) {
 			if($ticketId) {
 				db_query("UPDATE {uc_orders} SET uid = '%d' WHERE order_id = '%d'", $customerUid, $ticketId);
+			
+				if($customerUid) {
+					//Get the minumum role price later like client, right now getting last.
+					$rids = db_query("SELECT ur.rid FROM {users_roles} ur WHERE ur.uid = '%d'", $customerUid);
+
+					while($role = db_fetch_object($rids)) {
+						$rid = $role->rid;
+						$nodes = db_query("SELECT uop.nid, upprp.price FROM {uc_order_products} uop 
+							INNER JOIN {uc_price_per_role_prices} upprp on uop.nid = upprp.nid
+							WHERE uop.order_id = '%d' AND upprp.rid = '%d'", $ticketId, $rid);
+						while($node = db_fetch_object($nodes)) {
+							if($node->price) {
+								db_query("UPDATE {uc_order_products} SET price = '%f' WHERE order_id = '%d' AND nid = '%d'", $node->price, $ticketId, $node->nid);
+							}
+						}
+					}
+				} else {
+					//Reset to sell price
+					$nodes = db_query("SELECT uop.nid, up.sell_price FROM {uc_order_products} uop
+							 INNER JOIN {uc_products} up ON uop.nid = up.nid
+							 WHERE uop.order_id = '%d'", $ticketId);
+
+					while($node = db_fetch_object($nodes)) {
+						db_query("UPDATE {uc_order_products} SET price = '%f' WHERE order_id = '%d' AND nid = '%d'", $node->sell_price, $ticketId, $node->nid);
+					}
+				}
 			}
 
 			pos_api_expose_respond(array('status' => true, 'message' => 'Customer id has been set.'), true);
