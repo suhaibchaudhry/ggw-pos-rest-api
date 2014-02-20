@@ -9,6 +9,10 @@ function _pos_api_expose_load_special_prices($vid) {
 	return $prices;
 }
 
+function _pos_api_expose_get_category($nid) {
+	return db_result(db_query("SELECT gsrt.invoice_category FROM {term_node} tn INNER JOIN {ggw_state_reporting_terms} gsrt ON tn.tid = gsrt.vid WHERE tn.nid = '%d'", $nid));
+}
+
 function _pos_api_expose_map_product_datum($item) {
 	if(empty($item->filepath)) {
 		$item->filepath = 'sites/general-goods.com/files/imagefield_default_images/notfound_0.png';
@@ -25,6 +29,11 @@ function _pos_api_expose_map_product_datum($item) {
 		'image' => imagecache_create_url('pos_client_search', $item->filepath),
 		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath)
 	);
+
+	$category = _pos_api_expose_get_category($item->nid);
+	if($category) {
+		$product['category'] = $category;
+	}
 
 	if(!empty($item->qty)) {
 		$product['qty'] = (int)$item->qty;
