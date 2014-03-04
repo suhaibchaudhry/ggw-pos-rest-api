@@ -1,4 +1,6 @@
 <?php
+define("INVOICE_VOCABULARY", 1);
+
 function pos_api_expose_ticket_statuses() {
 	$failed_response = array(
 		'status' => false,
@@ -19,7 +21,14 @@ function pos_api_expose_ticket_statuses() {
 				}
 			}
 
-			pos_api_expose_respond(array('status' => true, 'stasuses' => $ticket_stasuses), true);
+			$categories = array();
+			$invoice_terms = db_query("SELECT tid, name FROM {term_data} WHERE vid = '%d'", INVOICE_VOCABULARY);
+
+			while($term = db_fetch_object($invoice_terms)) {
+				$categories[$term->name] = 0;
+			}
+
+			pos_api_expose_respond(array('status' => true, 'stasuses' => $ticket_stasuses, 'categories' => $categories), true);
 		}
 	}
 
