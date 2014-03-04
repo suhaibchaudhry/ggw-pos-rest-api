@@ -10,6 +10,30 @@ function _pos_api_expose_get_roles($uid) {
 	return $user_roles;
 }
 
+function pos_api_expose_customer_info() {
+	module_load_include('inc', 'user', 'user.pages');
+
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not get customer info.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$customer_uid = $request->customer_uid;
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			if($customer_uid) {
+				$customer = user_load($customer_uid);
+				$content = user_view($customer);
+				pos_api_expose_respond(array('status' => true, 'content' => $content), true);
+			}
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function _pos_api_expose_map_customer_datum($item) {
 	return array(
 				'id' => $item->uid,
