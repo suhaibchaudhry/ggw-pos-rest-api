@@ -1,4 +1,13 @@
 <?php
+//Privileged Roles
+define("ROLE_ADMIN", 8);
+define("ROLE_BACKOFFICE", 6);
+define("ROLE_DEVELOPER", 3);
+define("ROLE_FLOOR_MANAGER", 5);
+
+//Unprivileged Roles
+define("ROLE_FLOOR_AGENT", 4);
+
 function pos_api_expose_auth() {
 	$failed_response = array(
 		'login' => false,
@@ -11,8 +20,15 @@ function pos_api_expose_auth() {
 		$pass = md5($request->pass);
 		
 		$user = db_fetch_object(db_query("SELECT u.uid, COUNT(*) AS login_valid FROM {users} u WHERE u.name = '%s' AND u.pass = '%s'", $uname, $pass));
-		
+
+		//Check to make sure user has sufficient roles.
 		if($user->login_valid == 1) {
+			$privileged = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_BACKOFFICE."', '".ROLE_DEVELOPER."', '".ROLE_FLOOR_MANAGER."')", $user->uid));
+
+			$unprivileged = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid  = '".ROLE_FLOOR_AGENT."'", $user->uid));
+		}
+		
+		if($user->login_valid == 1 && ($privileged || $unprivileged)) {
 			$response = array(
 				'login' => true,
 				'id' => $user->uid,
@@ -44,6 +60,8 @@ function pos_api_expose_auth() {
 			} else {
 				$response['lunch'] = false;
 			}
+
+			$response['privileged'] = (bool)$privileged;
 
 			//Send token back on authentication
 			$response['token'] = $token;

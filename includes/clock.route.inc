@@ -1,4 +1,13 @@
 <?php
+//Privileged Roles
+define("ROLE_ADMIN", 8);
+define("ROLE_BACKOFFICE", 6);
+define("ROLE_DEVELOPER", 3);
+define("ROLE_FLOOR_MANAGER", 5);
+
+//Unprivileged Roles
+define("ROLE_FLOOR_AGENT", 4);
+
 function pos_api_expose_clockState() {
 	$failed_response = array(
 		'clock' => false,
@@ -11,6 +20,8 @@ function pos_api_expose_clockState() {
 
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
+			$privileged = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_BACKOFFICE."', '".ROLE_DEVELOPER."', '".ROLE_FLOOR_MANAGER."')", $uid));
+
 			$last_event = _pos_api_expose_last_event($uid, $event_type);
 
 			//Default clock states for user
@@ -30,6 +41,8 @@ function pos_api_expose_clockState() {
 			} else {
 				$response['lunch'] = false;
 			}
+
+			$response['privileged'] = (bool)$privileged;
 
 			pos_api_expose_respond($response, true);
 		}
