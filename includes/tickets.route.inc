@@ -35,6 +35,72 @@ function pos_api_expose_ticket_statuses() {
 	pos_api_expose_respond($failed_response);
 }
 
+function _pos_api_expose_employee_order_history($uid) {
+  $header = array(
+  	array('data' => t('Last Opened')),
+    array('data' => t('Order #')),
+    array('data' => t('Status')),
+    array('data' => t('Total')),
+    array('data' => t('Created On'))
+  );
+
+  $rows = array();
+
+  $context = array(
+    'revision' => 'themed-original',
+    'type' => 'amount',
+  );
+  $list = uc_order_status_list('general', TRUE);
+  $result = pager_query("SELECT uc.order_id, uc.uid, uc.created, uc.order_total AS total, log.timestamp, os.title FROM (SELECT * FROM {pos_api_expose_ticket_log} tl GROUP BY ticket_id ORDER BY MAX(timestamp) DESC) log INNER JOIN uc_orders uc ON log.ticket_id = uc.order_id INNER JOIN uc_order_statuses os ON uc.order_status = os.order_status_id WHERE log.uid = '%d'", 20, 0, "SELECT COUNT(*) FROM (SELECT * FROM {pos_api_expose_ticket_log} tl GROUP BY ticket_id ORDER BY MAX(timestamp) DESC) t2 WHERE t2.uid = '%d'", $uid);
+
+  // Build a table based on the customer's orders.
+  while ($order = db_fetch_object($result)) {
+    $context['subject'] = array('order' => $order);
+
+    $link = $order->order_id;
+
+    if (user_access('view all orders')) {
+      $link .= '<span class="order-admin-icons">'. uc_order_actions($order, TRUE) .'</span>';
+    }
+
+    $rows[] = array(
+    	array('data' => format_date($order->timestamp, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
+      array('data' => $link),
+      array('data' => check_plain($order->title)),
+      array('data' => uc_price($order->total, $context), 'align' => 'right'),
+      array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y')))
+    );
+  }
+
+  if (empty($rows)) {
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+  }
+
+  $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
+       . theme('pager', NULL, 20, 0);
+
+  return str_replace('src="/misc/', 'src="images/misc/', $content);
+}
+
+function pos_api_expose_recent_invoices() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not get recent employee invoices.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$uid = _pos_api_expose_uid_from_token($request->token);
+
+		if($uid) {
+			$invoices = _pos_api_expose_employee_order_history($uid);
+			pos_api_expose_respond(array('status' => true, 'content' => $invoices), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_new_ticket() {
 	$failed_response = array(
 		'status' => false,

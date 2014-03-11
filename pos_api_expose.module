@@ -193,6 +193,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/customers.route.inc'
   	);
 
+  	$routers['pos-api/employee/recent-tickets'] = array(
+  		'title' => 'Get Recent Tickets',
+  		'description' => 'Get AHAH recent ticket list.',
+		'page callback' => 'pos_api_expose_recent_invoices',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
 	return $routers;
 }
 
@@ -204,6 +213,7 @@ function pos_api_expose_respond($response, $die = FALSE) {
 		die();
 	}
 }
+
 function _pos_api_expose_last_event($uid, $event_type) {
 	return db_fetch_object(db_query("SELECT eid, checkin, checkout FROM {pos_api_expose_timesheet} WHERE uid = '%d' AND event_type = '%s' ORDER BY checkin DESC", $uid, $event_type));
 }
