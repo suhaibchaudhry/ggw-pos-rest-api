@@ -211,3 +211,8 @@ function _pos_api_expose_last_event($uid, $event_type) {
 function _pos_api_expose_uid_from_token($token) {
 	return db_result(db_query("SELECT paet.uid FROM {pos_api_expose_tokens} paet WHERE paet.token = '%s'", $token));
 }
+
+function _pos_api_expose_log_ticket_load($uid, $ticketId) {
+	$sql = "INSERT INTO {pos_api_expose_ticket_log} (uid, ticket_id, timestamp) VALUES ('%d', '%d', '%d')";
+	db_query($sql, $uid, $ticketId, time());
+}

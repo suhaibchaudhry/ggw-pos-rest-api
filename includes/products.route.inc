@@ -100,6 +100,8 @@ function pos_api_expose_load_ticket_products() {
 
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
+			_pos_api_expose_log_ticket_load($uid, $ticketId);
+
 			$ticketSql = "SELECT nid, qty FROM {uc_order_products} WHERE order_id = '%d'";
 
 			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, ts.qty

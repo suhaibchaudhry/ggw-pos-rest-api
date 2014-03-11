@@ -163,6 +163,9 @@ function pos_api_expose_ticket_current() {
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
+			$sql = "INSERT INTO {pos_api_expose_ticket_log} (uid, ticket_id, timestamp) VALUES ('%d', '%d', '%d')";
+			db_query($sql, $uid, $ticketId, time());
+
 			$sql = "SELECT uo.order_id, uo.uid, uo.order_status, os.title AS order_status_en
 					FROM uc_orders uo
 					INNER JOIN uc_order_statuses os ON uo.order_status = os.order_status_id

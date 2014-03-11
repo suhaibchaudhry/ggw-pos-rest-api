@@ -70,6 +70,43 @@ function pos_api_expose_schema() {
   		)
 	);
 
+	$schema['pos_api_expose_ticket_log'] = array(
+		'description' => 'Store employee ticket opening log.',
+		'fields' => array(
+			'eid' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'unsigned' => TRUE,
+				'description' => 'The event log id.'
+			),
+			'uid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of employee"
+			),
+			'ticket_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Ticket id open"
+			),
+			'timestamp' => array(
+				'description' => 'The Unix timestamp when event took place was created.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'big'
+			)
+		),
+		'primary key' => array('eid'),
+		'indexes' => array(
+    		'uid'        => array('uid'),
+  		)
+	);
+
 	return $schema;
 }
 
