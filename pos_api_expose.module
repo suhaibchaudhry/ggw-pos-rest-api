@@ -202,6 +202,33 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/ticket/quote'] = array(
+  		'title' => 'Get List of Quote Tickets',
+  		'description' => 'Get AHAH quote ticket list.',
+		'page callback' => 'pos_api_expose_quote_invoices',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
+  	$routers['pos-api/ticket/open'] = array(
+  		'title' => 'Get List of Open Tickets',
+  		'description' => 'Get AHAH quote ticket list.',
+		'page callback' => 'pos_api_expose_open_invoices',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
+  	$routers['pos-api/ticket/closed'] = array(
+  		'title' => 'Get List of closed Tickets',
+  		'description' => 'Get AHAH closed ticket list.',
+		'page callback' => 'pos_api_expose_closed_invoices',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
 	return $routers;
 }
 

@@ -82,6 +82,205 @@ function _pos_api_expose_employee_order_history($uid) {
   return str_replace('src="/misc/', 'src="images/misc/', $content);
 }
 
+function _pos_api_expose_quote_order_history($uid) {
+  $header = array(
+    array('data' => t('Date'), 'field' => 'o.created', 'sort' => 'desc'),
+    array('data' => t('Order #'), 'field' => 'o.order_id'),
+    array('data' => t('Status'), 'field' => 'os.title'),
+    array('data' => t('Products'), 'field' => 'products'),
+    array('data' => t('Total'), 'field' => 'o.order_total')
+  );
+
+  $rows = array();
+
+  $context = array(
+    'revision' => 'themed-original',
+    'type' => 'amount',
+  );
+
+  $result = pager_query("SELECT o.order_id, o.uid, o.created, os.title, SUM(op.qty) AS products, o.order_total AS total, o.order_status FROM {uc_orders} AS o LEFT JOIN {uc_order_statuses} AS os ON o.order_status = os.order_status_id LEFT JOIN {uc_order_products} AS op ON o.order_id = op.order_id WHERE o.order_status = 'pos_quote' GROUP BY o.order_id, o.uid, o.created, os.title, o.order_total, o.order_status". tablesort_sql($header), 20, 0, "SELECT COUNT(*) FROM {uc_orders} o WHERE o.order_status = 'pos_quote'");
+
+  // Build a table based on the customer's orders.
+  while ($order = db_fetch_object($result)) {
+    $context['subject'] = array('order' => $order);
+
+    $link = $order->order_id;
+
+    if (user_access('view all orders')) {
+      $link .= '<span class="order-admin-icons">'. uc_order_actions($order, TRUE) .'</span>';
+    }
+
+    $rows[] = array(
+      array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
+      array('data' => $link),
+      array('data' => check_plain($order->title)),
+      array('data' => (!is_null($order->products) ? $order->products : 0), 'align' => 'center'),
+      array('data' => uc_price($order->total, $context), 'align' => 'right'),
+    );
+  }
+
+  if (empty($rows)) {
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+  }
+
+  $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
+       . theme('pager', NULL, 20, 0);
+
+  return str_replace('src="/misc/', 'src="images/misc/', $content);
+}
+
+function _pos_api_expose_open_order_history() {
+  $header = array(
+    array('data' => t('Date'), 'field' => 'o.created', 'sort' => 'desc'),
+    array('data' => t('Order #'), 'field' => 'o.order_id'),
+    array('data' => t('Status'), 'field' => 'os.title'),
+    array('data' => t('Products'), 'field' => 'products'),
+    array('data' => t('Total'), 'field' => 'o.order_total')
+  );
+
+  $rows = array();
+
+  $context = array(
+    'revision' => 'themed-original',
+    'type' => 'amount',
+  );
+
+  $result = pager_query("SELECT o.order_id, o.uid, o.created, os.title, SUM(op.qty) AS products, o.order_total AS total, o.order_status FROM {uc_orders} AS o LEFT JOIN {uc_order_statuses} AS os ON o.order_status = os.order_status_id LEFT JOIN {uc_order_products} AS op ON o.order_id = op.order_id WHERE o.order_status = 'pos_in_progress' GROUP BY o.order_id, o.uid, o.created, os.title, o.order_total, o.order_status". tablesort_sql($header), 20, 0, "SELECT COUNT(*) FROM {uc_orders} o WHERE o.order_status = 'pos_in_progress'");
+
+  // Build a table based on the customer's orders.
+  while ($order = db_fetch_object($result)) {
+    $context['subject'] = array('order' => $order);
+
+    $link = $order->order_id;
+
+    if (user_access('view all orders')) {
+      $link .= '<span class="order-admin-icons">'. uc_order_actions($order, TRUE) .'</span>';
+    }
+
+    $rows[] = array(
+      array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
+      array('data' => $link),
+      array('data' => check_plain($order->title)),
+      array('data' => (!is_null($order->products) ? $order->products : 0), 'align' => 'center'),
+      array('data' => uc_price($order->total, $context), 'align' => 'right'),
+    );
+  }
+
+  if (empty($rows)) {
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+  }
+
+  $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
+       . theme('pager', NULL, 20, 0);
+
+  return str_replace('src="/misc/', 'src="images/misc/', $content);
+}
+
+function _pos_api_expose_closed_order_history() {
+  $header = array(
+    array('data' => t('Date'), 'field' => 'o.created', 'sort' => 'desc'),
+    array('data' => t('Order #'), 'field' => 'o.order_id'),
+    array('data' => t('Status'), 'field' => 'os.title'),
+    array('data' => t('Products'), 'field' => 'products'),
+    array('data' => t('Total'), 'field' => 'o.order_total')
+  );
+
+  $rows = array();
+
+  $context = array(
+    'revision' => 'themed-original',
+    'type' => 'amount',
+  );
+
+  $result = pager_query("SELECT o.order_id, o.uid, o.created, os.title, SUM(op.qty) AS products, o.order_total AS total, o.order_status FROM {uc_orders} AS o LEFT JOIN {uc_order_statuses} AS os ON o.order_status = os.order_status_id LEFT JOIN {uc_order_products} AS op ON o.order_id = op.order_id WHERE o.order_status = 'pos_completed' GROUP BY o.order_id, o.uid, o.created, os.title, o.order_total, o.order_status". tablesort_sql($header), 20, 0, "SELECT COUNT(*) FROM {uc_orders} o WHERE o.order_status = 'pos_completed'");
+
+  // Build a table based on the customer's orders.
+  while ($order = db_fetch_object($result)) {
+    $context['subject'] = array('order' => $order);
+
+    $link = $order->order_id;
+
+    if (user_access('view all orders')) {
+      $link .= '<span class="order-admin-icons">'. uc_order_actions($order, TRUE) .'</span>';
+    }
+
+    $rows[] = array(
+      array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
+      array('data' => $link),
+      array('data' => check_plain($order->title)),
+      array('data' => (!is_null($order->products) ? $order->products : 0), 'align' => 'center'),
+      array('data' => uc_price($order->total, $context), 'align' => 'right'),
+    );
+  }
+
+  if (empty($rows)) {
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+  }
+
+  $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
+       . theme('pager', NULL, 20, 0);
+
+  return str_replace('src="/misc/', 'src="images/misc/', $content);
+}
+
+function pos_api_expose_closed_invoices() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not get quote employee.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$uid = _pos_api_expose_uid_from_token($request->token);
+
+		if($uid) {
+			$invoices = _pos_api_expose_closed_order_history();
+			pos_api_expose_respond(array('status' => true, 'content' => $invoices), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
+function pos_api_expose_open_invoices() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not get quote employee.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$uid = _pos_api_expose_uid_from_token($request->token);
+
+		if($uid) {
+			$invoices = _pos_api_expose_open_order_history();
+			pos_api_expose_respond(array('status' => true, 'content' => $invoices), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
+function pos_api_expose_quote_invoices() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not get quote employee.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$uid = _pos_api_expose_uid_from_token($request->token);
+
+		if($uid) {
+			$invoices = _pos_api_expose_quote_order_history();
+			pos_api_expose_respond(array('status' => true, 'content' => $invoices), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
+
 function pos_api_expose_recent_invoices() {
 	$failed_response = array(
 		'status' => false,
