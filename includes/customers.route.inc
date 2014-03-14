@@ -1,4 +1,7 @@
 <?php
+define("CUSTOMER_NO_TAX", 11);
+define("CUSTOMER_TAX", 9);
+
 function _pos_api_expose_get_roles($uid) {
 	$user_roles = array();
 	$sql = "SELECT rid FROM {users_roles} ur WHERE ur.uid = '%d'";
@@ -187,6 +190,8 @@ function pos_api_expose_customer_search($token, $query) {
 							   ctp.field_company_address_street2) LIKE '%%%s%%'
 							   OR ctp.field_company_address_zip LIKE '%s%%'";
 
+			$allowed_customer_roles = "SELECT uid FROM users_roles WHERE rid IN ('".CUSTOMER_NO_TAX."', '".CUSTOMER_TAX."')";
+
 			$sql = "SELECT u.uid, n.title, u.name,
 
 					ctp.field_profile_company_phone_number,
@@ -205,7 +210,7 @@ function pos_api_expose_customer_search($token, $query) {
 					(".$accountid_search.") UNION
 					(".$phone_searches.") UNION (".$address_search."))
 					search ON search.vid = n.vid
-					WHERE n.type = 'profile'
+					WHERE n.type = 'profile' AND u.uid IN (".$allowed_customer_roles.")
 					ORDER BY search.relevance DESC
 					LIMIT 0, 8";
 
