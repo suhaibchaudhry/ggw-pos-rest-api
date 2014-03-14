@@ -1,6 +1,15 @@
 <?php
 define("INVOICE_VOCABULARY", 1);
 
+function _pos_api_expose_customer_link($uid) {
+	if($uid) {
+		$uname = db_result(db_query("SELECT name FROM {users} WHERE uid = '%s'", $uid));
+		return '<a class="ticket-customer-link" href="#" data-uid="'.$uid.'">'.$uname.'</a>';
+    } else {
+    	return 'Walk-In';
+    }
+}
+
 function pos_api_expose_ticket_statuses() {
 	$failed_response = array(
 		'status' => false,
@@ -39,6 +48,7 @@ function _pos_api_expose_employee_order_history($uid) {
   $header = array(
   	array('data' => t('Last Opened')),
     array('data' => t('Order #')),
+    array('data' => t('Customer')),
     array('data' => t('Status')),
     array('data' => t('Total')),
     array('data' => t('Created On'))
@@ -66,6 +76,7 @@ function _pos_api_expose_employee_order_history($uid) {
     $rows[] = array(
     	array('data' => format_date($order->timestamp, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
       array('data' => $link),
+      array('data' => _pos_api_expose_customer_link($order->uid)),
       array('data' => check_plain($order->title)),
       array('data' => uc_price($order->total, $context), 'align' => 'right'),
       array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y')))
@@ -86,6 +97,7 @@ function _pos_api_expose_quote_order_history($uid) {
   $header = array(
     array('data' => t('Date'), 'field' => 'o.created', 'sort' => 'desc'),
     array('data' => t('Order #'), 'field' => 'o.order_id'),
+    array('data' => t('Customer')),
     array('data' => t('Status'), 'field' => 'os.title'),
     array('data' => t('Products'), 'field' => 'products'),
     array('data' => t('Total'), 'field' => 'o.order_total')
@@ -113,6 +125,7 @@ function _pos_api_expose_quote_order_history($uid) {
     $rows[] = array(
       array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
       array('data' => $link),
+      array('data' => _pos_api_expose_customer_link($order->uid)),
       array('data' => check_plain($order->title)),
       array('data' => (!is_null($order->products) ? $order->products : 0), 'align' => 'center'),
       array('data' => uc_price($order->total, $context), 'align' => 'right'),
@@ -133,6 +146,7 @@ function _pos_api_expose_open_order_history() {
   $header = array(
     array('data' => t('Date'), 'field' => 'o.created', 'sort' => 'desc'),
     array('data' => t('Order #'), 'field' => 'o.order_id'),
+    array('data' => t('Customer')),
     array('data' => t('Status'), 'field' => 'os.title'),
     array('data' => t('Products'), 'field' => 'products'),
     array('data' => t('Total'), 'field' => 'o.order_total')
@@ -160,6 +174,7 @@ function _pos_api_expose_open_order_history() {
     $rows[] = array(
       array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
       array('data' => $link),
+      array('data' => _pos_api_expose_customer_link($order->uid)),
       array('data' => check_plain($order->title)),
       array('data' => (!is_null($order->products) ? $order->products : 0), 'align' => 'center'),
       array('data' => uc_price($order->total, $context), 'align' => 'right'),
@@ -180,6 +195,7 @@ function _pos_api_expose_closed_order_history() {
   $header = array(
     array('data' => t('Date'), 'field' => 'o.created', 'sort' => 'desc'),
     array('data' => t('Order #'), 'field' => 'o.order_id'),
+    array('data' => t('Customer')),
     array('data' => t('Status'), 'field' => 'os.title'),
     array('data' => t('Products'), 'field' => 'products'),
     array('data' => t('Total'), 'field' => 'o.order_total')
@@ -207,6 +223,7 @@ function _pos_api_expose_closed_order_history() {
     $rows[] = array(
       array('data' => format_date($order->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y'))),
       array('data' => $link),
+      array('data' => _pos_api_expose_customer_link($order->uid)),
       array('data' => check_plain($order->title)),
       array('data' => (!is_null($order->products) ? $order->products : 0), 'align' => 'center'),
       array('data' => uc_price($order->total, $context), 'align' => 'right'),
