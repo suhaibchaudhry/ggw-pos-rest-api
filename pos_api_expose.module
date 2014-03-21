@@ -229,6 +229,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/ticket/rma'] = array(
+  		'title' => 'RMA Process RPC Handler',
+  		'description' => 'Get confirmation of return when object is scanned.',
+  		'page callback' => 'pos_api_rma_process',
+  		'access arguments' => array('access content'),
+  		'type' => MENU_CALLBACK,
+  		'file' => 'includes/products.route.inc'
+  	);
+
 	return $routers;
 }
 
