@@ -50,7 +50,7 @@ function _pos_api_expose_map_product_rma($item) {
 	$product = array(
 		'date' => format_date($item->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y')),
 		'ticketId' => $item->order_id,
-		'id' => $item->nid,
+		'id' => $item->order_product_id,
 		'sku' => $item->model,
 		'packaging' => $item->field_prod_packing_value,
 		'sell_price' => $item->price,
@@ -82,7 +82,7 @@ function pos_api_rma_process() {
 		$customer_uid = $request->customer_uid;
 
 		if($uid) {
-			$items = db_query("SELECT uo.created, uop.order_id, uop.nid, uop.title, uop.model, uop.price, uop.qty, ctp.field_prod_packing_value, f.filepath
+			$items = db_query("SELECT uop.order_product_id, uo.created, uop.order_id, uop.nid, uop.title, uop.model, uop.price, uop.qty, ctp.field_prod_packing_value, f.filepath
 				FROM {uc_order_products} uop
 				INNER JOIN {uc_orders} uo ON uop.order_id = uo.order_id
 				LEFT JOIN {content_type_product} ctp ON uop.nid = ctp.nid
