@@ -57,7 +57,7 @@ function _pos_api_expose_map_product_rma($item) {
 		'name' => trim($item->title),
 		'image' => imagecache_create_url('pos_client_search', $item->filepath),
 		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath),
-		'qty' => $item->qty
+		'qty' => (int)$item->qty
 	);
 	/*
 	$category = _pos_api_expose_get_category($item->nid);
