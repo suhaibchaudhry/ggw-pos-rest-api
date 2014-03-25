@@ -170,6 +170,10 @@ function pos_api_expose_customer_search($token, $query) {
 							 FROM {node_revisions} nv
 							 HAVING relevance > 0";
 
+			$company_name = "SELECT nv.vid, 15 AS relevance
+							 FROM node_revisions nv
+							 WHERE UPPER(nv.title) LIKE UPPER('%%%s%%')";
+
 			//Search by Account ID
 			$accountid_search = "SELECT n.vid, 10 AS relevance
 								 FROM node n
@@ -208,14 +212,14 @@ function pos_api_expose_customer_search($token, $query) {
 					INNER JOIN content_type_profile ctp ON ctp.vid = n.vid
 					INNER JOIN ((".$fulltext_sql.") UNION
 					(".$accountid_search.") UNION
-					(".$phone_searches.") UNION (".$address_search."))
+					(".$phone_searches.") UNION (".$address_search.") UNION (".$company_name."))
 					search ON search.vid = n.vid
 					WHERE n.type = 'profile' AND u.uid IN (".$allowed_customer_roles.")
 					ORDER BY search.relevance DESC
 					LIMIT 0, 8";
 
 			$dataset = array();
-			$items = db_query($sql, $query, $query, $query, $query, $query, $query);
+			$items = db_query($sql, $query, $query, $query, $query, $query, $query, $query);
 
 			while($item = db_fetch_object($items)) {
 				$dataset[] = _pos_api_expose_map_customer_datum($item);

@@ -474,6 +474,10 @@ function pos_api_expose_ticket_search($token, $query) {
 							 FROM {node_revisions} nv
 							 HAVING relevance > 0";
 
+			$company_name = "SELECT nv.vid, 15 AS relevance
+							 FROM node_revisions nv
+							 WHERE UPPER(nv.title) LIKE UPPER('%%%s%%')";
+
 			//Search by Account ID
 			$accountid_search = "SELECT n.vid, 10 AS relevance
 								 FROM node n
@@ -490,7 +494,7 @@ function pos_api_expose_ticket_search($token, $query) {
 			$ticket_customers = "SELECT u.uid
 					FROM node n
 					INNER JOIN users u ON n.uid = u.uid
-					INNER JOIN ((".$fulltext_sql.") UNION (".$accountid_search.") UNION (".$phone_searches."))
+					INNER JOIN ((".$fulltext_sql.") UNION (".$accountid_search.") UNION (".$phone_searches.") UNION (".$company_name."))
 					search ON search.vid = n.vid
 					WHERE n.type = 'profile'";
 
@@ -501,7 +505,7 @@ function pos_api_expose_ticket_search($token, $query) {
 					ORDER BY uo.modified DESC";
 
 			$dataset = array();
-			$items = db_query($sql, $query, $query, $query, $query, $query);
+			$items = db_query($sql, $query, $query, $query, $query, $query, $query);
 
 			while($item = db_fetch_object($items)) {
 				$dataset[] = array('ticketId' => $item->order_id,
