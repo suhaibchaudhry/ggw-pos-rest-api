@@ -151,6 +151,13 @@ function pos_api_expose_schema() {
 		        'not null' => TRUE,
 		        'default' => 0.0,
 			),
+			'total' => array(
+				'type' => 'numeric',
+		        'precision' => 16,
+		        'scale' => 5,
+		        'not null' => TRUE,
+		        'default' => 0.0,
+			),
 			'timestamp' => array(
 				'description' => 'The Unix timestamp when event took place was created.',
         		'type' => 'int',

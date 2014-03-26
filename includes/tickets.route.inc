@@ -624,6 +624,34 @@ function pos_api_expose_ticket_update_zone() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_ticket_cash_checkout() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not checkout ticket, please check network and try again.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$total = $request->total;
+		$cash = $request->cash;
+		$change = $request->change;
+		$cuid = $request->customer;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			$sql = "INSERT INTO {pos_api_expose_cash_log} (uid, cuid, ticket_id, amount_paid, `change`, total, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', '%s', '%s')";
+			db_query($sql, $uid, $cuid, $ticketId, $cash, $change, $total, time());
+			pos_api_expose_respond(
+				array("status" => true,
+					  "message" => "Cash payment recorded.")
+			, true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_ticket_update_status() {
 	$failed_response = array(
 		'status' => false,
