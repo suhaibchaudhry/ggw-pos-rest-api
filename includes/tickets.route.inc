@@ -540,7 +540,7 @@ function pos_api_expose_ticket_add_product() {
 			$order_product->model = $request->sku;
 			$order_product->price = $request->price;
 
-			$order_product->cost = 0;
+			$order_product->cost = pos_stock_management_average_cost($order_product->nid);
 			$order_product->manufacturer = '';
 			$order_product->weight = 0;
 			$order_product->qty = 1;
