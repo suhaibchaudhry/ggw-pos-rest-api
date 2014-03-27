@@ -274,6 +274,15 @@ function pos_api_expose_menu() {
   		'file' => 'includes/products.route.inc'
   	);
 
+    $routers['admin/invoice/print/%'] = array(
+      'title' => 'Printable invoice',
+      'page arguments' => array(3),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'page callback' => 'pos_ticket_invoice',
+      'file' => 'includes/tickets.route.inc'
+    );
+
 	return $routers;
 }
 
