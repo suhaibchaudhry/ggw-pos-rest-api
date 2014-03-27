@@ -109,6 +109,25 @@ function pos_api_expose_customer_info() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_credit_summary() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not get customer credit summary.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$customer_uid = $request->customer;
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			$user = user_load($customer_uid);
+			pos_api_expose_respond(array('status' => true, 'credit_limits' => $user->credit_limits), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function _pos_api_expose_map_customer_datum($item) {
 	return array(
 				'id' => $item->uid,

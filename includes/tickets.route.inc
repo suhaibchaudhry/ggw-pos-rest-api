@@ -652,6 +652,31 @@ function pos_api_expose_ticket_cash_checkout() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_credit_checkout() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not checkout ticket, please check network and try again.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$total = $request->total;
+		$cuid = $request->customer;
+		$term_limit = $request->term_limit;
+		$due = ((int)$term_limit*86400)+time();
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled)
+				VALUES ('%d', '%d', '%s', '%d', '%s', '%s', '%d')", $cuid, $ticketId, $total, $term_limit, time(), $due, 0);
+			pos_api_expose_respond(array('status' => true, 'message' => 'Purchase complete.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_ticket_update_status() {
 	$failed_response = array(
 		'status' => false,

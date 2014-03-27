@@ -154,6 +154,15 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+  	$routers['pos-api/ticket/credit-checkout'] = array(
+  		'title' => 'Customer Credits Checkout',
+  		'description' => 'Checkout customer using credit.',
+  		'page callback' => 'pos_api_expose_credit_checkout',
+  		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/tickets.route.inc'
+  	);
+
   	$routers['pos-api/tickets/%/%'] = array(
   		'title' => 'Search Tickets',
   		'description' => 'Search for tickets by ticket id or customer info.',
@@ -198,6 +207,15 @@ function pos_api_expose_menu() {
   		'description' => 'Get customer info.',
 		'page callback' => 'pos_api_expose_customer_info',
 		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/customers.route.inc'
+  	);
+
+  	$routers['pos-api/customer/credits'] = array(
+  		'title' => 'Customer Credits',
+  		'description' => 'Get customers credit summary object.',
+  		'page callback' => 'pos_api_expose_credit_summary',
+  		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/customers.route.inc'
   	);
