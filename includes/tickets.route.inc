@@ -84,7 +84,7 @@ function _pos_api_expose_employee_order_history($uid) {
   }
 
   if (empty($rows)) {
-    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 6));
   }
 
   $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
@@ -133,7 +133,7 @@ function _pos_api_expose_quote_order_history($uid) {
   }
 
   if (empty($rows)) {
-    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 6));
   }
 
   $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
@@ -182,7 +182,7 @@ function _pos_api_expose_open_order_history() {
   }
 
   if (empty($rows)) {
-    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 6));
   }
 
   $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
@@ -231,7 +231,7 @@ function _pos_api_expose_closed_order_history() {
   }
 
   if (empty($rows)) {
-    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 5));
+    $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 6));
   }
 
   $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
