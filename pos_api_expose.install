@@ -169,12 +169,13 @@ function pos_api_expose_schema() {
 		'primary key' => array('pid'),
 		'indexes' => array(
     		'uid'        => array('uid'),
-    		'cuid'		 => array('cuid')
+    		'cuid'		 => array('cuid'),
+    		'ticket_id' => array('ticket_id')
   		)
 	);
 
-	$schema['pos_api_expose_rma_refund_log'] = array(
-		'description' => 'A log of rma refund payments.',
+	$schema['pos_api_expose_credit_card_log'] = array(
+		'description' => 'A log of cash payments.',
 		'fields' => array(
 			'pid' => array(
 				'type' => 'serial',
@@ -203,6 +204,73 @@ function pos_api_expose_schema() {
 				'unsigned' => TRUE,
 				'description' => "Ticket id paid."
 			),
+			'amount_paid' => array(
+				'type' => 'numeric',
+		        'precision' => 16,
+		        'scale' => 5,
+		        'not null' => TRUE,
+		        'default' => 0.0,
+			),
+			'transaction_id' => array(
+				'description' => t('Credit card transaction id.'),
+        		'type' => 'varchar',
+        		'length' => 255,
+        		'not null' => TRUE,
+        		'default' => ''
+			),
+			'timestamp' => array(
+				'description' => 'The Unix timestamp when event took place was created.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'big'
+			)
+		),
+		'primary key' => array('pid'),
+		'indexes' => array(
+    		'uid'        => array('uid'),
+    		'cuid'		 => array('cuid'),
+    		'ticket_id' => array('ticket_id')
+  		)
+	);
+
+	$schema['pos_api_expose_rma_refund_log'] = array(
+		'description' => 'A log of rma refund payments.',
+		'fields' => array(
+			'pid' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'unsigned' => TRUE,
+				'description' => 'The payment event log id.'
+			),
+			'uid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of employee"
+			),
+			'cuid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of customer"
+			),
+			'credit_usage_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "credit usage id."
+			),
+			'ticket_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Ticket id paid."
+			),
 			'refund' => array(
 				'type' => 'numeric',
 		        'precision' => 16,
@@ -221,7 +289,237 @@ function pos_api_expose_schema() {
 		'primary key' => array('pid'),
 		'indexes' => array(
     		'uid'        => array('uid'),
-    		'cuid'		 => array('cuid')
+    		'cuid'		 => array('cuid'),
+    		'ticket_id' => array('ticket_id')
+  		)
+	);
+
+	$schema['pos_api_expose_check_log'] = array(
+		'description' => 'A log of check payments.',
+		'fields' => array(
+			'pid' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'unsigned' => TRUE,
+				'description' => 'The payment event log id.'
+			),
+			'uid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of employee"
+			),
+			'cuid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of customer"
+			),
+			'ticket_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Ticket id paid."
+			),
+			'paid_amount' => array(
+				'type' => 'numeric',
+		        'precision' => 16,
+		        'scale' => 5,
+		        'not null' => TRUE,
+		        'default' => 0.0,
+			),
+			'post_dated' => array(
+				'description' => 'Wheter check is postdated.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'tiny'
+			),
+			'cash_date' => array(
+				'description' => t('Cash date of post dated check.'),
+        		'type' => 'varchar',
+        		'length' => 255,
+        		'not null' => TRUE,
+        		'default' => ''
+			),
+			'timestamp' => array(
+				'description' => 'The Unix timestamp when event took place was created.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'big'
+			)
+		),
+		'primary key' => array('pid'),
+		'indexes' => array(
+    		'uid'        => array('uid'),
+    		'cuid'		 => array('cuid'),
+    		'ticket_id' => array('ticket_id')
+  		)
+	);
+
+	$schema['pos_api_expose_money_order_log'] = array(
+		'description' => 'A log of check payments.',
+		'fields' => array(
+			'pid' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'unsigned' => TRUE,
+				'description' => 'The payment event log id.'
+			),
+			'uid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of employee"
+			),
+			'cuid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of customer"
+			),
+			'ticket_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Ticket id paid."
+			),
+			'paid_amount' => array(
+				'type' => 'numeric',
+		        'precision' => 16,
+		        'scale' => 5,
+		        'not null' => TRUE,
+		        'default' => 0.0,
+			),
+			'reference' => array(
+				'description' => t('Money order reference.'),
+        		'type' => 'varchar',
+        		'length' => 255,
+        		'not null' => TRUE,
+        		'default' => ''
+			),
+			'timestamp' => array(
+				'description' => 'The Unix timestamp when event took place was created.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'big'
+			)
+		),
+		'primary key' => array('pid'),
+		'indexes' => array(
+    		'uid'        => array('uid'),
+    		'cuid'		 => array('cuid'),
+    		'ticket_id' => array('ticket_id')
+  		)
+	);
+
+	$schema['pos_api_expose_transaction_log'] = array(
+		'description' => 'A log of rma refund payments.',
+		'fields' => array(
+			'pid' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'unsigned' => TRUE,
+				'description' => 'The payment event log id.'
+			),
+			'uid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of employee"
+			),
+			'cuid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of customer"
+			),
+			'credit_usage_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "credit usage id."
+			),
+			'ticket_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Ticket id paid. Not required for rma refunds."
+			),
+			'amount' => array(
+				'type' => 'numeric',
+		        'precision' => 16,
+		        'scale' => 5,
+		        'not null' => TRUE,
+		        'default' => 0.0,
+			),
+			'cash_pid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Cash pid"
+			),
+			'rma_pid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "RMA pid"
+			),
+			'cc_pid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "CC pid"
+			),
+			'check_pid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Check pid"
+			),
+			'mo_pid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Check pid"
+			),
+			'register_id' => array(
+				'description' => t('Register id'),
+        		'type' => 'varchar',
+        		'length' => 255,
+        		'not null' => TRUE,
+        		'default' => ''
+			),
+			'timestamp' => array(
+				'description' => 'The Unix timestamp when event took place was created.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'big'
+			)
+		),
+		'primary key' => array('pid'),
+		'indexes' => array(
+    		'uid'        => array('uid'),
+    		'cuid'		 => array('cuid'),
+    		'ticket_id' => array('ticket_id')
   		)
 	);
 
