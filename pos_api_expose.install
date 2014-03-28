@@ -449,7 +449,7 @@ function pos_api_expose_schema() {
         		'not null' => TRUE,
         		'default' => 0,
 				'unsigned' => TRUE,
-				'description' => "credit usage id."
+				'description' => "credit usage id. Only populated for RMA returns."
 			),
 			'ticket_id' => array(
 				'type' => 'int',

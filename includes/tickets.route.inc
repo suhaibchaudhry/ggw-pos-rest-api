@@ -638,10 +638,53 @@ function pos_api_expose_ticket_cash_checkout() {
 		$change = $request->change;
 		$cuid = $request->customer;
 
+		$cash_value = $request->cash_val;
+
+		$check = $request->check;
+		$check_val = $request->check_val;
+		$post_dated = $request->check_post_dated;
+		$check_date = $request->check_date;
+
+		$mo = $request->mo;
+		$mo_val = $request->mo_val;
+		$mo_ref = $request->mo_ref;
+
+		$credit = $request->credit;
+		$credit_val = $request->credit_val;
+		$transac_id = $request->transac_id;
+
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			$sql = "INSERT INTO {pos_api_expose_cash_log} (uid, cuid, ticket_id, amount_paid, `change`, total, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', '%s', '%s')";
-			db_query($sql, $uid, $cuid, $ticketId, $cash, $change, $total, time());
+			//When change is sent to credits it will be 0 here.
+			db_query($sql, $uid, $cuid, $ticketId, $cash_value, $change, $total, time());
+			$cash_pid = db_last_insert_id('pos_api_expose_cash_log', 'pid');
+
+			$check_pid = 0;
+			if($check) {
+				$sql = "INSERT INTO {pos_api_expose_check_log} (uid, cuid, ticket_id, paid_amount, post_dated, cash_date, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%d', '%s', '%s')";
+				db_query($sql, $uid, $cuid, $ticketId, $check_val, $post_dated, $check_date, time());
+				$check_pid = db_last_insert_id('pos_api_expose_check_log', 'pid');
+			}
+
+			$mo_pid = 0;
+			if($mo) {
+				$sql = "INSERT INTO {pos_api_expose_money_order_log} (uid, cuid, ticket_id, paid_amount, reference, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', '%s')";
+				db_query($sql, $uid, $cuid, $ticketId, $mo_val, $mo_ref, time());
+				$mo_pid = db_last_insert_id('pos_api_expose_money_order_log', 'pid');
+			}
+
+			$credit_pid = 0;
+			if($credit) {
+				$sql = "INSERT INTO {pos_api_expose_credit_card_log} (uid, cuid, ticket_id, amount_paid, transaction_id, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', %s)";
+				db_query($sql, $uid, $cuid, $ticketId, $credit_val, $transac_id, time());
+				$credit_pid = db_last_insert_id('pos_api_expose_credit_card_log', 'pid');
+			}
+
+			$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`)
+				VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s')";
+			db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, 'A', time());
+
 			pos_api_expose_respond(
 				array("status" => true,
 					  "message" => "Cash payment recorded.")
