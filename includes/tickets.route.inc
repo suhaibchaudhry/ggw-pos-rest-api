@@ -736,7 +736,7 @@ function pos_api_expose_rma_refund() {
 		$request = json_decode($_POST['request']);
 		$ticketId = $request->ticketId;
 		$total = $request->total;
-		$cuid = $request->customer;
+		$cuid = $request->customer_uid;
 		$products = $request->products;
 		$register_id = $request->register_id;
 
