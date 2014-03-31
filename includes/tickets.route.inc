@@ -742,7 +742,7 @@ function pos_api_expose_rma_refund() {
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
-			db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled) VALUES '%d', '%d', '%s', '0', '%s', '%s', '0'", $uid, $ticketId, $total, time(), time());
+			db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled) VALUES ('%d', '%d', '-%s', '0', '%s', '%s', '0')", $cuid, $ticketId, $total, time(), time());
 			$credit_usage_id = $rma_pid = db_last_insert_id('user_term_credits_usages', 'cuid');
 			db_query("INSERT INTO {pos_api_expose_rma_refund_log} (uid, cuid, credit_usage_id, total_refund, `timestamp`)
 				VALUES ('%d', '%d', '%d', '%s', '%s')", $uid, $cuid, $credit_usage_id, $total, time());
@@ -756,7 +756,7 @@ function pos_api_expose_rma_refund() {
 				}
 			}
 
-			pos_api_expose_respond(array('status' => true, 'message' => 'Refund complete.'), true);
+			pos_api_expose_respond(array('status' => true, 'message' => 'Refund complete. Amount was credited to customer account.'), true);
 		}
 	}
 
