@@ -150,8 +150,8 @@ function pos_api_expose_menu() {
   		'description' => 'Checkout with cash.',
   		'page callback' => 'pos_api_expose_ticket_cash_checkout',
   		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
+		  'type' => MENU_CALLBACK,
+		  'file' => 'includes/tickets.route.inc'
   	);
 
   	$routers['pos-api/ticket/credit-checkout'] = array(
@@ -159,9 +159,18 @@ function pos_api_expose_menu() {
   		'description' => 'Checkout customer using credit.',
   		'page callback' => 'pos_api_expose_credit_checkout',
   		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
+		  'type' => MENU_CALLBACK,
+		  'file' => 'includes/tickets.route.inc'
   	);
+
+    $routers['pos-api/ticket/rma-checkout'] = array(
+      'title' => 'Customer RMA Checkout',
+      'description' => 'Checkout customer RMA ticket.',
+      'page callback' => 'pos_api_expose_rma_refund',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
 
   	$routers['pos-api/tickets/%/%'] = array(
   		'title' => 'Search Tickets',

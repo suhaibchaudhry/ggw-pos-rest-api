@@ -726,6 +726,43 @@ function pos_api_expose_credit_checkout() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_rma_refund() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not checkout process refund, please check network and try again.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$total = $request->total;
+		$cuid = $request->customer;
+		$products = $request->products;
+		$register_id = $request->register_id;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled) VALUES '%d', '%d', '%s', '0', '%s', '%s', '0'", $uid, $ticketId, $total, time(), time());
+			$credit_usage_id = $rma_pid = db_last_insert_id('user_term_credits_usages', 'cuid');
+			db_query("INSERT INTO {pos_api_expose_rma_refund_log} (uid, cuid, credit_usage_id, total_refund, `timestamp`)
+				VALUES ('%d', '%d', '%d', '%s', '%s')", $uid, $cuid, $credit_usage_id, $total, time());
+			$rma_pid = db_last_insert_id('pos_api_expose_credit_card_log', 'pid');
+
+			db_query("INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, amount, rma_pid, register_id, `timestamp`) VALUES ('%d', '%d', '%s', '%d', '%s', '%s')", $uid, $cuid, $total, $rma_pid, $register_id, time());
+
+			if($products) {
+				foreach($products as $product) {
+					db_query("INSERT INTO {pos_api_expose_rma_returned_products} (order_product_id, qty_returned, refund_log_pid, price) VALUES ('%d', '%d', '%d', '%s')", $product->order_product_id, $product->qty_returned, $rma_pid, $product->price);
+				}
+			}
+
+			pos_api_expose_respond(array('status' => true, 'message' => 'Refund complete.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_ticket_update_status() {
 	$failed_response = array(
 		'status' => false,
