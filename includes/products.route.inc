@@ -88,7 +88,7 @@ function pos_api_rma_process() {
 				LEFT JOIN {content_type_product} ctp ON uop.nid = ctp.nid
 				LEFT JOIN {content_field_image_cache} cfic ON uop.nid = cfic.nid
 				LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
-				WHERE uo.uid = '%d' AND uop.model = '%s'", $customer_uid, $item_barcode);
+				WHERE uo.uid = '%d' AND uop.model = '%s' AND uo.order_status = 'pos_completed'", $customer_uid, $item_barcode);
 
 			if($items) {
 				$products = array();

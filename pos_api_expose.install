@@ -264,14 +264,7 @@ function pos_api_expose_schema() {
 				'unsigned' => TRUE,
 				'description' => "credit usage id."
 			),
-			'ticket_id' => array(
-				'type' => 'int',
-        		'not null' => TRUE,
-        		'default' => 0,
-				'unsigned' => TRUE,
-				'description' => "Ticket id paid."
-			),
-			'refund' => array(
+			'total_refund' => array(
 				'type' => 'numeric',
 		        'precision' => 16,
 		        'scale' => 5,
@@ -332,7 +325,7 @@ function pos_api_expose_schema() {
 		        'default' => 0.0,
 			),
 			'post_dated' => array(
-				'description' => 'Wheter check is postdated.',
+				'description' => 'Whether check is postdated.',
         		'type' => 'int',
         		'not null' => TRUE,
         		'default' => 0,
@@ -357,6 +350,50 @@ function pos_api_expose_schema() {
 		'indexes' => array(
     		'uid'        => array('uid'),
     		'cuid'		 => array('cuid'),
+    		'ticket_id' => array('ticket_id')
+  		)
+	);
+
+	$schema['pos_api_expose_rma_returned_products'] = array(
+		'description' => 'Items returned',
+		'fields' => array(
+			'rid' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'unsigned' => TRUE,
+				'description' => 'The payment event log id.'
+			),
+			'order_product_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Order product id returned."
+			),
+			'qty_returned' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Ticket id paid."
+			),
+			'refund_log_pid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Ticket id paid."
+			),
+			'price' => array(
+				'type' => 'numeric',
+		        'precision' => 16,
+		        'scale' => 5,
+		        'not null' => TRUE,
+		        'default' => 0.0,
+			)
+		),
+		'primary key' => array('rid'),
+		'indexes' => array(
     		'ticket_id' => array('ticket_id')
   		)
 	);
@@ -422,7 +459,7 @@ function pos_api_expose_schema() {
 	);
 
 	$schema['pos_api_expose_transaction_log'] = array(
-		'description' => 'A log of rma refund payments.',
+		'description' => 'A log of transactions payments.',
 		'fields' => array(
 			'pid' => array(
 				'type' => 'serial',
@@ -449,14 +486,14 @@ function pos_api_expose_schema() {
         		'not null' => TRUE,
         		'default' => 0,
 				'unsigned' => TRUE,
-				'description' => "credit usage id. Only populated for RMA returns."
+				'description' => "credit usage id. Only populated for credit purchases."
 			),
 			'ticket_id' => array(
 				'type' => 'int',
         		'not null' => TRUE,
         		'default' => 0,
 				'unsigned' => TRUE,
-				'description' => "Ticket id paid. Not required for rma refunds."
+				'description' => "Ticket id paid."
 			),
 			'amount' => array(
 				'type' => 'numeric',
