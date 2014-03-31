@@ -243,7 +243,7 @@ function pos_api_expose_rma_products() {
 
 			$total = db_result(db_query("SELECT SUM(refunds.total_refund) FROM (SELECT DISTINCT rl.pid, uop.order_id, rl.total_refund FROM pos_api_expose_rma_refund_log rl
 					INNER JOIN pos_api_expose_rma_returned_products rp ON rl.pid = rp.refund_log_pid
-					INNER JOIN uc_order_products uop ON uop.order_product_id = rp.order_product_id) refunds"));
+					INNER JOIN uc_order_products uop ON uop.order_product_id = rp.order_product_id) refunds WHERE refunds.order_id = '%d'", $ticketId));
 			
 			pos_api_expose_respond(array('status' => true, 'products' => $data, 'total' => $total), true);
 		}
