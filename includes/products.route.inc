@@ -13,7 +13,7 @@ function _pos_api_expose_get_category($nid) {
 	return db_result(db_query("SELECT gsrt.invoice_category FROM {term_node} tn INNER JOIN {ggw_state_reporting_terms} gsrt ON tn.tid = gsrt.vid WHERE tn.nid = '%d'", $nid));
 }
 
-function _pos_api_expose_map_product_datum($item) {
+function _pos_api_expose_map_product_datum($item, $special_price = true) {
 	if(empty($item->filepath)) {
 		$item->filepath = 'sites/general-goods.com/files/imagefield_default_images/notfound_0.png';
 	}
@@ -24,11 +24,14 @@ function _pos_api_expose_map_product_datum($item) {
 		'list_price' => $item->list_price,
 		'packaging' => $item->field_prod_packing_value,
 		'sell_price' => $item->sell_price,
-		'special_prices' => _pos_api_expose_load_special_prices($item->vid),
 		'name' => trim($item->title),
 		'image' => imagecache_create_url('pos_client_search', $item->filepath),
 		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath)
 	);
+
+	if($special_price) {
+		$product['special_prices'] = _pos_api_expose_load_special_prices($item->vid);
+	}
 
 	$category = _pos_api_expose_get_category($item->nid);
 	if($category) {
@@ -201,6 +204,48 @@ function pos_api_expose_load_ticket_products() {
 			}	
 
 			pos_api_expose_respond(array('status' => true, 'products' => $dataset), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
+function pos_api_expose_rma_products() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not load return item products.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$token = $request->token;
+		$ticketId = $request->ticketId;
+
+		$uid = _pos_api_expose_uid_from_token($token);
+		if($uid) {
+			$sql = "SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, rp.qty_returned AS qty
+					FROM {pos_api_expose_rma_returned_products} rp
+					INNER JOIN {uc_order_products} uop ON rp.order_product_id = uop.order_product_id
+					INNER JOIN {uc_products} p ON p.nid = uop.nid
+					INNER JOIN {node} n ON n.vid = p.vid
+
+					LEFT JOIN {content_field_image_cache} cfic ON n.vid = cfic.vid
+					LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
+					LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
+
+					WHERE uop.order_id = '%d'";
+
+			$products = db_query($sql, $ticketId);
+			$data = array();
+			while($product = db_fetch_object($products)) {
+				$data[] = _pos_api_expose_map_product_datum($product, false);
+			}
+
+			$total = db_result(db_query("SELECT SUM(refunds.total_refund) FROM (SELECT DISTINCT rl.pid, uop.order_id, rl.total_refund FROM pos_api_expose_rma_refund_log rl
+					INNER JOIN pos_api_expose_rma_returned_products rp ON rl.pid = rp.refund_log_pid
+					INNER JOIN uc_order_products uop ON uop.order_product_id = rp.order_product_id) refunds"));
+			
+			pos_api_expose_respond(array('status' => true, 'products' => $data, 'total' => $total), true);
 		}
 	}
 

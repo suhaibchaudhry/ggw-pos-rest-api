@@ -172,6 +172,16 @@ function pos_api_expose_menu() {
       'file' => 'includes/tickets.route.inc'
     );
 
+    $routers['pos-api/ticket/rma-products'] = array(
+      'title' => 'Customer RMA Products',
+      'description' => 'Products of customer RMA ticket.',
+      'page callback' => 'pos_api_expose_rma_products',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/products.route.inc'
+    );
+
+
   	$routers['pos-api/tickets/%/%'] = array(
   		'title' => 'Search Tickets',
   		'description' => 'Search for tickets by ticket id or customer info.',
