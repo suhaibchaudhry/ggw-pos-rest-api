@@ -652,6 +652,7 @@ function pos_api_expose_ticket_cash_checkout() {
 		$credit = $request->credit;
 		$credit_val = $request->credit_val;
 		$transac_id = $request->transac_id;
+		$register_id = $request->register_id;
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
@@ -683,7 +684,7 @@ function pos_api_expose_ticket_cash_checkout() {
 
 			$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`)
 				VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s')";
-			db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, 'A', time());
+			db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time());
 
 			pos_api_expose_respond(
 				array("status" => true,
@@ -707,12 +708,17 @@ function pos_api_expose_credit_checkout() {
 		$total = $request->total;
 		$cuid = $request->customer;
 		$term_limit = $request->term_limit;
+		$register_id = $request->register_id;
 		$due = ((int)$term_limit*86400)+time();
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled)
 				VALUES ('%d', '%d', '%s', '%d', '%s', '%s', '%d')", $cuid, $ticketId, $total, $term_limit, time(), $due, 0);
+			$credit_pid = db_last_insert_id('pos_api_expose_credit_card_log', 'pid');
+			$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, credit_usage_id, register_id, `timestamp`)
+				VALUES ('%d', '%d', '%d', '%s', '%d', '%s', '%s')";
+			db_query($sql, $uid, $cuid, $ticketId, $total, $credit_pid, $register_id, time());
 			pos_api_expose_respond(array('status' => true, 'message' => 'Purchase complete.'), true);
 		}
 	}
