@@ -282,8 +282,7 @@ function pos_api_expose_schema() {
 		'primary key' => array('pid'),
 		'indexes' => array(
     		'uid'        => array('uid'),
-    		'cuid'		 => array('cuid'),
-    		'ticket_id' => array('ticket_id')
+    		'cuid'		 => array('cuid')
   		)
 	);
 
@@ -392,10 +391,7 @@ function pos_api_expose_schema() {
 		        'default' => 0.0,
 			)
 		),
-		'primary key' => array('rid'),
-		'indexes' => array(
-    		'ticket_id' => array('ticket_id')
-  		)
+		'primary key' => array('rid')
 	);
 
 	$schema['pos_api_expose_money_order_log'] = array(
