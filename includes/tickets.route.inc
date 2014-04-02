@@ -595,6 +595,11 @@ function pos_api_expose_ticket_update_totals() {
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			db_query("UPDATE {uc_orders} SET order_total = '%f', product_count = '%d' WHERE order_id = '%d'", $total, $product_count, $ticketId);
+
+			//Trigger Tax calculation on server via hooks.
+			$order = uc_order_load($ticketId);
+			uc_order_module_invoke('save', $order, NULL);
+
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket totals updated.'), true);
 		}
