@@ -776,6 +776,11 @@ function pos_api_expose_ticket_update_status() {
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
+			//Trigger tax calculation on server.
+			if($ticketStatus == 'pos_completed') {
+				$order = uc_order_load($ticketId);
+				uc_order_module_invoke('save', $order, NULL);
+			}
 			db_query("UPDATE {uc_orders} SET order_status = '%s' WHERE order_id = '%d'", $ticketStatus, $ticketId);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket status updated.'), true);
