@@ -185,9 +185,9 @@ function pos_api_expose_load_ticket_products() {
 		if($uid) {
 			_pos_api_expose_log_ticket_load($uid, $ticketId);
 
-			$ticketSql = "SELECT nid, qty FROM {uc_order_products} WHERE order_id = '%d'";
+			$ticketSql = "SELECT nid, qty, price FROM {uc_order_products} WHERE order_id = '%d'";
 
-			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, ts.qty
+			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, ts.price AS sell_price, f.filepath, ctp_wrap.field_prod_packing_value, ts.qty
 					FROM {uc_products} p
 					INNER JOIN {node} n ON n.vid = p.vid
 
@@ -223,7 +223,7 @@ function pos_api_expose_rma_products() {
 
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
-			$sql = "SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, rp.qty_returned AS qty
+			$sql = "SELECT n.nid, n.vid, n.title, p.model, p.list_price, uop.price AS sell_price, f.filepath, ctp_wrap.field_prod_packing_value, rp.qty_returned AS qty
 					FROM {pos_api_expose_rma_returned_products} rp
 					INNER JOIN {uc_order_products} uop ON rp.order_product_id = uop.order_product_id
 					INNER JOIN {uc_products} p ON p.nid = uop.nid
