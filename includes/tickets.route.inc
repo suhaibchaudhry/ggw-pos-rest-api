@@ -25,7 +25,8 @@ function pos_api_expose_ticket_statuses() {
 			$sql = "SELECT order_status_id, title FROM {uc_order_statuses}";
 			$order_stasuses = db_query($sql);
 			while($order_stasus = db_fetch_object($order_stasuses)) {
-				if(strpos($order_stasus->title, 'Ecom ::') === FALSE) { //Take away ecommerce ticket stasuses.
+				if(strpos($order_stasus->title, 'Ecom ::') === FALSE) {
+					//Take away ecommerce ticket stasuses.
 					$ticket_stasuses[$order_stasus->order_status_id] = $order_stasus->title;
 				}
 			}
@@ -373,6 +374,7 @@ function pos_api_expose_ticket_update_customer() {
 		if($uid) {
 			if($ticketId) {
 				db_query("UPDATE {uc_orders} SET uid = '%d' WHERE order_id = '%d'", $customerUid, $ticketId);
+				pos_api_expose_ticket_update_total_on_server($ticketId);
 			
 				if($customerUid) {
 					//Get the minumum role price later like client, right now getting last.
@@ -580,6 +582,15 @@ function pos_api_expose_ticket_remove_product() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_ticket_update_total_on_server($ticketId) {
+	//Trigger Tax calculation and Total update on server via hooks.
+	$order = uc_order_load($ticketId);
+	//Create Tax Line Item
+	uc_order_module_invoke('save', $order, NULL);
+	//Refresh to calculate current Price
+	uc_order_load($ticketId);
+}
+
 function pos_api_expose_ticket_update_totals() {
 	$failed_response = array(
 		'status' => false,
@@ -589,17 +600,12 @@ function pos_api_expose_ticket_update_totals() {
 	if(array_key_exists('request', $_POST)) {
 		$request = json_decode($_POST['request']);
 		$ticketId = $request->ticketId;
-		$total = $request->total;
+		//$total = $request->total;
 		$product_count = $request->productCount;
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
-			db_query("UPDATE {uc_orders} SET order_total = '%f', product_count = '%d' WHERE order_id = '%d'", $total, $product_count, $ticketId);
-
-			//Trigger Tax calculation on server via hooks.
-			$order = uc_order_load($ticketId);
-			uc_order_module_invoke('save', $order, NULL);
-
+			pos_api_expose_ticket_update_total_on_server($ticketId);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket totals updated.'), true);
 		}
@@ -783,9 +789,9 @@ function pos_api_expose_ticket_update_status() {
 		if($uid) {
 			//Trigger tax calculation on server.
 			if($ticketStatus == 'pos_completed') {
-				$order = uc_order_load($ticketId);
-				uc_order_module_invoke('save', $order, NULL);
+				pos_api_expose_ticket_update_total_on_server($ticketId);
 			}
+
 			db_query("UPDATE {uc_orders} SET order_status = '%s' WHERE order_id = '%d'", $ticketStatus, $ticketId);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket status updated.'), true);
