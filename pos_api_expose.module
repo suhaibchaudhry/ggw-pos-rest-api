@@ -181,6 +181,14 @@ function pos_api_expose_menu() {
       'file' => 'includes/products.route.inc'
     );
 
+    $routers['pos-api/ticket/load-total'] = array(
+      'title' => 'Ticket Total',
+      'description' => 'Get the complete total on a ticket from server before checkout.',
+      'page callback' => 'pos_api_expose_ticket_totals',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
 
   	$routers['pos-api/tickets/%/%'] = array(
   		'title' => 'Search Tickets',

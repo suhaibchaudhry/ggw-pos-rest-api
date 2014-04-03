@@ -45,6 +45,28 @@ function pos_api_expose_ticket_statuses() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_ticket_totals() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not load ticket stasuses.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		$ticketId = $request->ticketId;
+		if($uid) {
+			pos_api_expose_ticket_update_total_on_server($ticketId);
+			$total = db_result(db_query("SELECT order_total FROM uc_orders WHERE order_id = '%d'", $ticketId));
+			$taxes = db_result(db_query("SELECT SUM(amount) FROM uc_order_line_items WHERE order_id = '%d' AND type = 'tax'", $ticketId));
+
+			pos_api_expose_respond(array('status' => true, 'total' => $total, 'taxes' => $taxes), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function _pos_api_expose_employee_order_history($uid) {
   $header = array(
   	array('data' => t('Last Opened')),
