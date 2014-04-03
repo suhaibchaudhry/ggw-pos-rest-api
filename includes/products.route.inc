@@ -153,6 +153,7 @@ function pos_api_expose_product_search($token, $query) {
 
 					INNER JOIN (('.$sku_sql.') UNION ALL ('.$fulltext_sql.')) fts ON n.vid = fts.vid
 
+					WHERE n.status > 0
 					ORDER BY fts.relevance DESC
 					LIMIT 0, 12';
 
@@ -282,7 +283,7 @@ function pos_api_expose_product_scan() {
 					LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
 					LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
 
-					WHERE p.vid IN ('.$sku_sql.')
+					WHERE p.vid IN ('.$sku_sql.') AND n.status > 0
 					LIMIT 0, 1';
 
 			$product = db_fetch_object(db_query($sql, $barcode, $barcode, $barcode));
