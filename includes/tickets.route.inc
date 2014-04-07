@@ -719,6 +719,8 @@ function pos_api_expose_ticket_cash_checkout() {
 				VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s')";
 			db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time());
 
+			_pos_api_expose_stock_adjustment($ticketId);
+
 			pos_api_expose_respond(
 				array("status" => true,
 					  "message" => "Cash payment recorded.")
@@ -727,6 +729,14 @@ function pos_api_expose_ticket_cash_checkout() {
 	}
 
 	pos_api_expose_respond($failed_response);
+}
+
+function _pos_api_expose_stock_adjustment($ticketId) {
+	$products = db_query("SELECT nid, qty, price FROM {uc_order_products} WHERE order_id = '%d'", $ticketId);
+
+	while($product = db_fetch_object($products)) {
+		db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $product->nid, $product->qty, $product->price, time());
+	}
 }
 
 function pos_api_expose_credit_checkout() {
@@ -752,6 +762,7 @@ function pos_api_expose_credit_checkout() {
 			$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, credit_usage_id, register_id, `timestamp`)
 				VALUES ('%d', '%d', '%d', '%s', '%d', '%s', '%s')";
 			db_query($sql, $uid, $cuid, $ticketId, $total, $credit_pid, $register_id, time());
+			_pos_api_expose_stock_adjustment($ticketId);
 			pos_api_expose_respond(array('status' => true, 'message' => 'Purchase complete.'), true);
 		}
 	}
@@ -786,6 +797,8 @@ function pos_api_expose_rma_refund() {
 			if($products) {
 				foreach($products as $product) {
 					db_query("INSERT INTO {pos_api_expose_rma_returned_products} (order_product_id, qty_returned, refund_log_pid, price) VALUES ('%d', '%d', '%d', '%s')", $product->order_product_id, $product->qty_returned, $rma_pid, $product->price);
+
+					db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $product->nid, (-1)*$product->qty_returned, $product->price, time());
 				}
 			}
 

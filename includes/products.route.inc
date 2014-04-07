@@ -54,6 +54,7 @@ function _pos_api_expose_map_product_rma($item) {
 		'date' => format_date($item->created, 'custom', variable_get('uc_date_format_default', 'm/d/Y')),
 		'ticketId' => $item->order_id,
 		'id' => $item->order_product_id,
+		'nid' => $item->nid,
 		'sku' => $item->model,
 		'packaging' => $item->field_prod_packing_value,
 		'sell_price' => $item->price,
