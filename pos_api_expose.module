@@ -301,6 +301,15 @@ function pos_api_expose_menu() {
   		'file' => 'includes/products.route.inc'
   	);
 
+    $routers['pos-api/ticket/product/manager-override'] = array(
+      'title' => 'Manager Price Override',
+      'description' => 'Manager price override rpc handler.',
+      'page callback' => 'pos_api_expose_manager_override',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
+
     $routers['admin/invoice/print/%'] = array(
       'title' => 'Printable invoice',
       'page arguments' => array(3),

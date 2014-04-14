@@ -852,3 +852,28 @@ function pos_ticket_invoice($order_id) {
 		print "Access denied to invoice.";
 	}
 }
+
+function pos_api_expose_manager_override() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not override product price.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$productNid = $request->productNid;
+		$qty_split = $request->qty_split;
+		$unit_price = $request->unit_price;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			//Trigger tax calculation on server.
+			db_query("INSERT INTO pos_api_expose_manager_override_log (uid, ticket_id, product_nid, qty_split, unit_price, `timestamp`) VALUES ('%d', '%d', '%d', '%d', '%s', '%s')", $uid, $ticketId, $productNid, $qty_split, $unit_price, time());
+			pos_api_expose_respond(array('status' => true,
+										 'message' => 'Manager override updated.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
