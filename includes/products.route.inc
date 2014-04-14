@@ -189,7 +189,7 @@ function pos_api_expose_load_ticket_products() {
 
 			$ticketSql = "SELECT nid, qty, price FROM {uc_order_products} WHERE order_id = '%d'";
 
-			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, ts.price AS sell_price, f.filepath, ctp_wrap.field_prod_packing_value, ts.qty
+			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, ts.qty
 					FROM {uc_products} p
 					INNER JOIN {node} n ON n.vid = p.vid
 
