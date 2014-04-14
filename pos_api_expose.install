@@ -625,7 +625,9 @@ function pos_api_expose_uninstall() {
 	drupal_uninstall_schema('pos_api_expose');
 }
 
-function pos_api_expose_update_6010() {
-	$schema = drupal_get_schema('pos_api_expose');
-	drupal_install_schema($schema['pos_api_expose_manager_override_log']);
+function pos_api_expose_update_6014() {
+	$res = array();
+	$table_name = 'pos_api_expose_manager_override_log';
+	$table = drupal_get_schema_unprocessed('pos_api_expose', $table_name);
+	db_create_table($res, $table_name, $table);
 }
