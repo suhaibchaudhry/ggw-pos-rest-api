@@ -107,6 +107,64 @@ function pos_api_expose_schema() {
   		)
 	);
 
+	$schema['pos_api_expose_manager_override_log'] = array(
+		'description' => 'Store employee ticket opening log.',
+		'fields' => array(
+			'eid' => array(
+				'type' => 'serial',
+				'not null' => TRUE,
+				'unsigned' => TRUE,
+				'description' => 'The event log id.'
+			),
+			'uid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "User ID of employee"
+			),
+			'ticket_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Ticket id open"
+			),
+			'product_nid' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "Product nid"
+			),
+			'qty_split' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "quantity split"
+			),
+			'unit_price' => array(
+				'type' => 'numeric',
+		        'precision' => 16,
+		        'scale' => 5,
+		        'not null' => TRUE,
+		        'default' => 0.0,
+			),
+			'timestamp' => array(
+				'description' => 'The Unix timestamp when event took place was created.',
+        		'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'size' => 'big'
+			)
+		),
+		'primary key' => array('eid'),
+		'indexes' => array(
+    		'uid'        => array('uid'),
+  		)
+	);
+
 	$schema['pos_api_expose_cash_log'] = array(
 		'description' => 'A log of cash payments.',
 		'fields' => array(
@@ -565,4 +623,9 @@ function pos_api_expose_install() {
 
 function pos_api_expose_uninstall() {
 	drupal_uninstall_schema('pos_api_expose');
+}
+
+function pos_api_expose_update_6010() {
+	$schema = drupal_get_schema('pos_api_expose');
+	drupal_install_schema($schema['pos_api_expose_manager_override_log']);
 }
