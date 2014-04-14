@@ -116,7 +116,7 @@ function _pos_api_expose_employee_order_history($uid) {
   return str_replace('src="/misc/', 'src="images/misc/', $content);
 }
 
-function _pos_api_expose_quote_order_history($uid) {
+function _pos_api_expose_quote_order_history() {
   $header = array(
     array('data' => t('Date'), 'field' => 'o.created', 'sort' => 'desc'),
     array('data' => t('Order #'), 'field' => 'o.order_id'),
