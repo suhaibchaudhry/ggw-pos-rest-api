@@ -870,6 +870,7 @@ function pos_api_expose_manager_override() {
 		if($uid) {
 			//Trigger tax calculation on server.
 			db_query("INSERT INTO pos_api_expose_manager_override_log (uid, ticket_id, product_nid, qty_split, unit_price, `timestamp`) VALUES ('%d', '%d', '%d', '%d', '%s', '%s')", $uid, $ticketId, $productNid, $qty_split, $unit_price, time());
+			db_query("UPDATE uc_order_products SET price = '%s' WHERE order_id ='%d' AND nid = '%d'", $unit_price, $ticketId, $productNid);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Manager override updated.'), true);
 		}

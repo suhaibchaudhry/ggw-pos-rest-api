@@ -13,7 +13,7 @@ function _pos_api_expose_get_category($nid) {
 	return db_result(db_query("SELECT gsrt.invoice_category FROM {term_node} tn INNER JOIN {ggw_state_reporting_terms} gsrt ON tn.tid = gsrt.vid WHERE tn.nid = '%d'", $nid));
 }
 
-function _pos_api_expose_map_product_datum($item, $special_price = true) {
+function _pos_api_expose_map_product_datum($item, $special_price = true, $ticketId = FALSE) {
 	if(empty($item->filepath)) {
 		$item->filepath = 'sites/general-goods.com/files/imagefield_default_images/notfound_0.png';
 	}
@@ -28,6 +28,13 @@ function _pos_api_expose_map_product_datum($item, $special_price = true) {
 		'image' => imagecache_create_url('pos_client_search', $item->filepath),
 		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath)
 	);
+
+	if($ticketId) {
+		$price = db_result(db_query("SELECT mol.unit_price FROM {pos_api_expose_manager_override_log} mol WHERE mol.ticket_id = '%d' AND mol.product_nid = '%d' ORDER BY `timestamp` DESC", $ticketId, $item->nid));
+		if($price) {
+			$product['manager_price'] = $price;
+		}
+	}
 
 	if($special_price) {
 		$product['special_prices'] = _pos_api_expose_load_special_prices($item->vid);
@@ -202,7 +209,7 @@ function pos_api_expose_load_ticket_products() {
 		    $items = db_query($sql, $ticketId);
 			$dataset = array();
 			while($item = db_fetch_object($items)) {
-				$dataset[] = _pos_api_expose_map_product_datum($item);
+				$dataset[] = _pos_api_expose_map_product_datum($item, true, $ticketId);
 			}	
 
 			pos_api_expose_respond(array('status' => true, 'products' => $dataset), true);
