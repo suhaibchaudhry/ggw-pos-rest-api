@@ -150,6 +150,8 @@ function pos_api_expose_product_search($token, $query) {
 							 FROM {node_revisions} nv
 							 HAVING relevance > 0";
 
+			$partial_sql = "SELECT nvv.vid, 0 AS relevance FROM {node_revisions} nvv WHERE nvv.title LIKE '%s%%'";
+
 			//UNION ALL appears to be significantly faster than UNION.
 			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value
 					FROM {uc_products} p
@@ -159,7 +161,7 @@ function pos_api_expose_product_search($token, $query) {
 					LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
 					LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
 
-					INNER JOIN (('.$sku_sql.') UNION ALL ('.$fulltext_sql.')) fts ON n.vid = fts.vid
+					INNER JOIN (('.$sku_sql.') UNION ALL ('.$fulltext_sql.') UNION ALL ('.$partial_sql.')) fts ON n.vid = fts.vid
 
 					WHERE n.status > 0
 					ORDER BY fts.relevance DESC
@@ -167,7 +169,7 @@ function pos_api_expose_product_search($token, $query) {
 
 			$dataset = array();
 
-			$items = db_query($sql, $query, $query, $query, $query);
+			$items = db_query($sql, $query, $query, $query, $query, $query);
 			while($item = db_fetch_object($items)) {
 				$dataset[] = _pos_api_expose_map_product_datum($item);
 			}
