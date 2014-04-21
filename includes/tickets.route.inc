@@ -607,6 +607,11 @@ function pos_api_expose_ticket_remove_product() {
 function pos_api_expose_ticket_update_total_on_server($ticketId) {
 	//Trigger Tax calculation and Total update on server via hooks.
 	$order = uc_order_load($ticketId);
+	//Save manager overrides
+	$overrides = db_query("SELECT ticket_id, product_nid, unit_price FROM {pos_api_expose_manager_override_log} ol WHERE ol.ticket_id = '%d'", $ticketId);
+	while($override = db_fetch_object($overrides)) {
+		db_query("UPDATE {uc_order_products} SET price = '%s' WHERE order_id = '%d' AND nid = '%d'", $override->unit_price, $override->ticket_id, $override->product_nid);
+	}
 	//Create Tax Line Item
 	uc_order_module_invoke('save', $order, NULL);
 	//Refresh to calculate current Price
