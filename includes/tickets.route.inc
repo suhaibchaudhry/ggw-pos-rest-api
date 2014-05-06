@@ -763,10 +763,10 @@ function pos_api_expose_credit_checkout() {
 		if($uid) {
 			db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled)
 				VALUES ('%d', '%d', '%s', '%d', '%s', '%s', '%d')", $cuid, $ticketId, $total, $term_limit, time(), $due, 0);
-			$credit_pid = db_last_insert_id('pos_api_expose_credit_card_log', 'pid');
+			$credit_usage_id = db_last_insert_id('user_term_credits_usages', 'cuid');
 			$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, credit_usage_id, register_id, `timestamp`)
 				VALUES ('%d', '%d', '%d', '%s', '%d', '%s', '%s')";
-			db_query($sql, $uid, $cuid, $ticketId, $total, $credit_pid, $register_id, time());
+			db_query($sql, $uid, $cuid, $ticketId, $total, $credit_usage_id, $register_id, time());
 			_pos_api_expose_stock_adjustment($ticketId);
 			pos_api_expose_respond(array('status' => true, 'message' => 'Purchase complete.'), true);
 		}
