@@ -1,0 +1,3 @@
+[submodule "includes/anet_php_sdk"]
+	path = includes/anet_php_sdk
+	url = https://github.com/AuthorizeNet/sdk-php.git
