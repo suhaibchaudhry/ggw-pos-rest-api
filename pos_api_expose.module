@@ -2,6 +2,15 @@
 function pos_api_expose_menu() {
 	//Post Format: {request : {uname, pass}}
 	//Secure later by changing access arguments to something more role based
+  $routers['admin/settings/pos-payment'] = array(
+    'title' => 'Point of Sale Payment',
+    'description' => 'Configure authorize.net account information.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('pos_api_expose_admin_payment_settings'),
+    'access arguments' => array('administer conditional actions'),
+    'type' => MENU_NORMAL_ITEM
+  );
+
 	$routers['pos-api/auth'] = array(
 		'title' => 'Authenticate POS Users',
 		'page callback' => 'pos_api_expose_auth',
@@ -153,6 +162,15 @@ function pos_api_expose_menu() {
 		  'type' => MENU_CALLBACK,
 		  'file' => 'includes/tickets.route.inc'
   	);
+
+    $routers['pos-api/ticket/swipe-checkout'] = array(
+      'title' => 'Credit Card Swipe Checkout',
+      'description' => 'Checkout RPC for magnetic card swipe.',
+      'page callback' => 'pos_api_expose_ticket_swipe_checkout',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
 
     $routers['pos-api/ticket/rma-checkout'] = array(
       'title' => 'Customer RMA Checkout',
@@ -311,6 +329,51 @@ function pos_api_expose_menu() {
     );
 
 	return $routers;
+}
+
+function pos_api_expose_admin_payment_settings() {
+  $form = array();
+
+  $form['pos_api_expose_testing_enabled'] = array(
+      '#type' => 'radios', 
+      '#title' => t('Operation Mode'), 
+      '#default_value' => variable_get('pos_api_expose_testing_enabled', 1), 
+      '#options' => array(t('Live Mode'), t('Test Mode')),
+  );
+  
+  $form['pos_api_expose_login_id'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Production API Login ID'),
+    '#default_value' => variable_get('pos_api_expose_login_id', ''),
+    '#description' => 'API login ID for your Authorize.net merchant account.',
+    '#required' => TRUE
+  );
+
+  $form['pos_api_expose_transac_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Production Transaction Key'),
+    '#default_value' => variable_get('pos_api_expose_transac_key', ''),
+    '#description' => 'Transaction for your Authorize.net merchant account.',
+    '#required' => TRUE
+  );
+
+  $form['pos_api_expose_login_id_test'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Test API Login ID'),
+    '#default_value' => variable_get('pos_api_expose_login_id_test', ''),
+    '#description' => 'API login ID for your Authorize.net merchant account.',
+    '#required' => FALSE
+  );
+
+  $form['pos_api_expose_transac_key_test'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Test Transaction Key'),
+    '#default_value' => variable_get('pos_api_expose_transac_key_test', ''),
+    '#description' => 'Transaction for your Authorize.net merchant account.',
+    '#required' => FALSE
+  );
+
+  return system_settings_form($form);
 }
 
 function pos_api_expose_respond($response, $die = FALSE) {
