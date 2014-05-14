@@ -397,3 +397,28 @@ function _pos_api_expose_log_ticket_load($uid, $ticketId) {
 	$sql = "INSERT INTO {pos_api_expose_ticket_log} (uid, ticket_id, timestamp) VALUES ('%d', '%d', '%d')";
 	db_query($sql, $uid, $ticketId, time());
 }
+
+function _pos_api_transaction_details($transaction_id) {
+  module_load_include('php', 'pos_api_expose', 'includes/anet_php_sdk/AuthorizeNet');
+
+  $test_mode = variable_get('pos_api_expose_testing_enabled', 1);
+  if($test_mode) {
+    $api_login = variable_get('pos_api_expose_login_id_test', '');
+    $transac_key = variable_get('pos_api_expose_transac_key_test', '');
+    define("AUTHORIZENET_SANDBOX", true);
+  } else {
+    $api_login = variable_get('pos_api_expose_login_id', '');
+    $transac_key = variable_get('pos_api_expose_transac_key', '');
+    define("AUTHORIZENET_SANDBOX", false);
+  }
+
+  if( !empty($transac_key) && !empty($api_login) ) {
+    define("AUTHORIZENET_API_LOGIN_ID", $api_login);
+    define("AUTHORIZENET_TRANSACTION_KEY", $transac_key);
+    $request = new AuthorizeNetTD;
+    $response = $request->getTransactionDetails($transaction_id);
+    return $response;
+  }
+
+  return false;
+}
