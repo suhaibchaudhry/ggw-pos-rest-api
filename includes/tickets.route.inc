@@ -565,6 +565,11 @@ function pos_api_expose_ticket_add_product() {
 			$order_product->price = $request->price;
 
 			$order_product->cost = pos_stock_management_average_cost($order_product->nid);
+			if(empty($order_product->cost)) {
+				//Use default automagic cost.
+				$order_product->cost = db_result(db_query("SELECT cost FROM {uc_products} WHERE nid = '%d'", $order_product->nid));
+			}
+
 			$order_product->manufacturer = '';
 			$order_product->weight = 0;
 			$order_product->qty = 1;
