@@ -165,7 +165,7 @@ function pos_api_expose_product_search($token, $query) {
 
 					WHERE n.status > 0
 					ORDER BY fts.relevance DESC
-					LIMIT 0, 12';
+					LIMIT 0, 48';
 
 			$dataset = array();
 
