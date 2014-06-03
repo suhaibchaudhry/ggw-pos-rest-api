@@ -68,8 +68,16 @@ function _pos_api_expose_map_product_rma($item) {
 		'name' => trim($item->title),
 		'image' => imagecache_create_url('pos_client_search', $item->filepath),
 		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath),
-		'qty' => (int)$item->qty
+		'qty' => (int)$item->qty,
+		'remaining_qty' => $item->remaining_qty
 	);
+
+	if($item->remaining_qty) {
+		$product['remaining_qty'] = $item->remaining_qty;
+	} else {
+		$product['remaining_qty'] = $item->qty;
+	}
+
 	/*
 	$category = _pos_api_expose_get_category($item->nid);
 	if($category) {
@@ -93,13 +101,14 @@ function pos_api_rma_process() {
 		$customer_uid = $request->customer_uid;
 
 		if($uid) {
-			$items = db_query("SELECT uop.order_product_id, uo.created, uop.order_id, uop.nid, uop.title, uop.model, uop.price, uop.qty, ctp.field_prod_packing_value, f.filepath
+			$items = db_query("SELECT uop.order_product_id, uo.created, uop.order_id, uop.nid, uop.title, uop.model, uop.price, uop.qty, ctp.field_prod_packing_value, f.filepath, (uop.qty-rma.qty_returned) AS remaining_qty
 				FROM {uc_order_products} uop
 				INNER JOIN {uc_orders} uo ON uop.order_id = uo.order_id
 				LEFT JOIN {content_type_product} ctp ON uop.nid = ctp.nid
 				LEFT JOIN {content_field_image_cache} cfic ON uop.nid = cfic.nid
 				LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
-				WHERE uo.uid = '%d' AND uop.model = '%s' AND uo.order_status = 'pos_completed' AND uop.order_product_id NOT IN (SELECT order_product_id FROM pos_api_expose_rma_returned_products)", $customer_uid, $item_barcode);
+				LEFT JOIN (SELECT order_product_id, SUM(qty_returned) AS qty_returned FROM {pos_api_expose_rma_returned_products} GROUP BY order_product_id) rma ON uop.order_product_id = rma.order_product_id
+				WHERE uo.uid = '%d' AND uop.model = '%s' AND uo.order_status = 'pos_completed' AND (uop.qty > rma.qty_returned OR ISNULL(rma.qty_returned))", $customer_uid, $item_barcode);
 
 			if($items) {
 				$products = array();
