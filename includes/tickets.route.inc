@@ -580,7 +580,7 @@ function pos_api_expose_ticket_add_product() {
 			drupal_write_record('uc_order_products', $order_product);
 
 			pos_api_expose_respond(array('status' => true,
-										 'ticketProductId' => $order->order_product_id), true);
+										 'ticketProductId' => $order_product->order_product_id), true);
 		}
 	}
 
