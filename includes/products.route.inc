@@ -36,6 +36,10 @@ function _pos_api_expose_map_product_datum($item, $special_price = true, $ticket
 		}
 	}
 
+	if($item->order_product_id) {
+		$product['order_product_id'] = $item->order_product_id;
+	}
+
 	if($special_price) {
 		$product['special_prices'] = _pos_api_expose_load_special_prices($item->vid);
 	}
@@ -204,20 +208,19 @@ function pos_api_expose_load_ticket_products() {
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
 			_pos_api_expose_log_ticket_load($uid, $ticketId);
+			
+			$sql = "SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, uo.qty, uo.order_product_id
+			FROM {uc_order_products} uo
 
-			$ticketSql = "SELECT nid, qty, price FROM {uc_order_products} WHERE order_id = '%d'";
+			INNER JOIN {uc_products} p ON p.nid = uo.nid
+			INNER JOIN {node} n ON n.vid = p.vid
 
-			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, ts.qty
-					FROM {uc_products} p
-					INNER JOIN {node} n ON n.vid = p.vid
+			LEFT JOIN {content_field_image_cache} cfic ON n.vid = cfic.vid
+        		LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
+        		LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
+        		WHERE order_id = '%d'";
 
-					LEFT JOIN {content_field_image_cache} cfic ON n.vid = cfic.vid
-					LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
-					LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
-
-					INNER JOIN ('.$ticketSql.') ts ON ts.nid = n.nid';
-
-		    $items = db_query($sql, $ticketId);
+    		        $items = db_query($sql, $ticketId);
 			$dataset = array();
 			while($item = db_fetch_object($items)) {
 				$dataset[] = _pos_api_expose_map_product_datum($item, true, $ticketId);
