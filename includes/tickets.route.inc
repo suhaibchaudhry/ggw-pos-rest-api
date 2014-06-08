@@ -435,7 +435,7 @@ function pos_api_expose_ticket_update_customer() {
 function pos_api_expose_ticket_update_product_qty() {
 	$failed_response = array(
 		'status' => false,
-		'error' => 'Could not update a ticket product quantity. Test'
+		'error' => 'Could not update a ticket product quantity.'
 	);
 
 	if(array_key_exists('request', $_POST)) {
