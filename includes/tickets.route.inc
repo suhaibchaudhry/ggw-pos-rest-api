@@ -433,28 +433,20 @@ function pos_api_expose_ticket_update_customer() {
 }
 
 function pos_api_expose_ticket_update_product_qty() {
-	$failed_response = array(
-		'status' => false,
-		'error' => 'Could not update a ticket product quantity.'
-	);
-
-	if(array_key_exists('request', $_POST)) {
 		$request = json_decode($_POST['request']);
-		$ticketId = $request->ticketId;
-		$productId = $request->productId;
-		$qty = $request->qty;
+                $ticketId = $request->ticketId;
+                $qtyGraph = $request->qtyGraph;
+		$queries = '';
+                $uid = _pos_api_expose_uid_from_token($request->token);
+                if($uid) {
+                        if($ticketId) {
+                                foreach($qtyGraph as $qtyUpdate) { 
+					db_query("UPDATE {uc_order_products} SET qty = '%d' WHERE order_id = '%d' AND order_product_id = '%d'", $qtyUpdate->qty, $ticketId, $qtyUpdate->productId);
+				}
+                        }
 
-		$uid = _pos_api_expose_uid_from_token($request->token);
-		if($uid) {
-			if($ticketId) {
-				db_query("UPDATE {uc_order_products} SET qty = '%d' WHERE order_id = '%d' AND nid = '%d'", $qty, $ticketId, $productId);
-			}
-
-			pos_api_expose_respond(array('status' => true, 'message' => 'Product qty updated.'), true);
-		}
-	}
-
-	pos_api_expose_respond($failed_response);
+                        pos_api_expose_respond(array('status' => true, 'message' => 'Product qty updated. Test'.$queries), true);
+                }
 }
 
 function pos_api_expose_ticket_current() {
@@ -600,7 +592,7 @@ function pos_api_expose_ticket_remove_product() {
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
-			db_query("DELETE FROM {uc_order_products} WHERE order_id = '%d' AND nid = '%d'", $ticketId, $productId);
+			db_query("DELETE FROM {uc_order_products} WHERE order_id = '%d' AND order_product_id = '%d'", $ticketId, $productId);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket product removed.'), true);
 		}
