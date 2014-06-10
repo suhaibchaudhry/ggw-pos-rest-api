@@ -29,15 +29,15 @@ function _pos_api_expose_map_product_datum($item, $special_price = true, $ticket
 		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath)
 	);
 
-	if($ticketId) {
-		$price = db_result(db_query("SELECT mol.unit_price FROM {pos_api_expose_manager_override_log} mol WHERE mol.ticket_id = '%d' AND mol.product_nid = '%d' ORDER BY `timestamp` DESC", $ticketId, $item->nid));
-		if($price) {
-			$product['manager_price'] = $price;
-		}
-	}
-
 	if($item->order_product_id) {
 		$product['order_product_id'] = $item->order_product_id;
+
+		if($ticketId) {
+			$price = db_result(db_query("SELECT mol.unit_price FROM {pos_api_expose_manager_override_log} mol WHERE mol.ticket_id = '%d' AND mol.product_nid = '%d' ORDER BY `timestamp` DESC", $ticketId, $item->order_product_id));
+			if($price) {
+				$product['manager_price'] = $price;
+			}
+		}
 	}
 
 	if($special_price) {
