@@ -163,7 +163,7 @@ function pos_api_expose_product_search($token, $query) {
 							 FROM {node_revisions} nv
 							 HAVING relevance > 0";
 
-			$partial_sql = "SELECT nvv.vid, 50 AS relevance FROM {node_revisions} nvv WHERE nvv.title LIKE '%s%%'";
+			$partial_sql = "SELECT nvv.vid, 50 AS relevance FROM {node_revisions} nvv WHERE LOWER(nvv.title) LIKE LOWER('%s%%')";
 
 			//UNION ALL appears to be significantly faster than UNION.
 			$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value
