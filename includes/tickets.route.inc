@@ -593,6 +593,7 @@ function pos_api_expose_ticket_remove_product() {
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			db_query("DELETE FROM {uc_order_products} WHERE order_id = '%d' AND order_product_id = '%d'", $ticketId, $productId);
+			db_query("DELETE FROM {pos_api_expose_manager_override_log} WHERE ticket_id = '%d' AND product_nid = '%d'", $ticketId, $productId);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket product removed.'), true);
 		}
