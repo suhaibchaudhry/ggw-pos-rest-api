@@ -3,7 +3,13 @@ define("INVOICE_VOCABULARY", 1);
 
 function _pos_api_expose_customer_link($uid) {
 	if($uid) {
-		$uname = db_result(db_query("SELECT name FROM {users} WHERE uid = '%s'", $uid));
+		$user = db_fetch_object(db_query("SELECT u.name, n.title FROM {users} u LEFT JOIN {node} n ON u.uid = n.uid WHERE u.uid = '%s'", $uid));
+		if($user->title) {
+			$uname = $user->title." (".$user->name.")";
+		} else {
+			$uname = $user->name;
+		}
+
 		return '<a class="ticket-customer-link" href="#" data-uid="'.$uid.'">'.$uname.'</a>';
     } else {
     	return 'Walk-In';
