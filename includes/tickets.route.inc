@@ -530,7 +530,9 @@ function pos_api_expose_ticket_search($token, $query) {
 			$items = db_query($sql, $query, $query, $query, $query, $query, $query);
 
 			while($item = db_fetch_object($items)) {
+				$company_name = db_result(db_query("SELECT title FROM {node} WHERE type ='profile' AND uid = '%d'", $item->uid));
 				$dataset[] = array('ticketId' => $item->order_id,
+										 'companyName' => $company_name,
 										 'ticketStatus' => $item->order_status,
 										 'ticketStatus_en' => $item->order_status_en,
 										 'customerUid' => $item->uid);
