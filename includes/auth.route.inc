@@ -26,6 +26,8 @@ function pos_api_expose_auth() {
 			$privileged = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_BACKOFFICE."', '".ROLE_DEVELOPER."', '".ROLE_FLOOR_MANAGER."')", $user->uid));
 
 			$unprivileged = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid  = '".ROLE_FLOOR_AGENT."'", $user->uid));
+
+			$admin = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_DEVELOPER."')", $user->uid));
 		}
 		
 		if($user->login_valid == 1 && ($privileged || $unprivileged)) {
@@ -62,6 +64,7 @@ function pos_api_expose_auth() {
 			}
 
 			$response['privileged'] = (bool)$privileged;
+			$response['admin'] = (bool)$admin;
 
 			//Send token back on authentication
 			$response['token'] = $token;

@@ -22,6 +22,8 @@ function pos_api_expose_clockState() {
 		if($uid) {
 			$privileged = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_BACKOFFICE."', '".ROLE_DEVELOPER."', '".ROLE_FLOOR_MANAGER."')", $uid));
 
+			$admin = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_DEVELOPER."')", $uid));
+
 			$last_event = _pos_api_expose_last_event($uid, $event_type);
 
 			//Default clock states for user
@@ -43,6 +45,7 @@ function pos_api_expose_clockState() {
 			}
 
 			$response['privileged'] = (bool)$privileged;
+			$response['admin'] = (bool)$admin;
 
 			pos_api_expose_respond($response, true);
 		}
