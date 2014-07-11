@@ -100,7 +100,7 @@ function pos_api_expose_customer_info() {
 				$customer = user_load($customer_uid);
 				$customer_info = user_view($customer);
 				$invoices = _pos_api_expose_order_history($customer);
-				$payments = utc_credit_report($customer);
+				$payments = utc_credit_report_pos($customer);
 				pos_api_expose_respond(array('status' => true, 'customer_info' => $customer_info, 'invoices' => $invoices, 'payments' => $payments), true);
 			}
 		}
