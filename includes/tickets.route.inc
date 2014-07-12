@@ -772,6 +772,7 @@ function pos_api_expose_ticket_cash_checkout() {
 
 		$check = $request->check;
 		$check_val = $request->check_val;
+		$check_number = $request->check_number;
 		$post_dated = $request->check_post_dated;
 		$check_date = $request->check_date;
 
@@ -793,8 +794,8 @@ function pos_api_expose_ticket_cash_checkout() {
 
 			$check_pid = 0;
 			if($check) {
-				$sql = "INSERT INTO {pos_api_expose_check_log} (uid, cuid, ticket_id, paid_amount, post_dated, cash_date, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%d', '%s', '%s')";
-				db_query($sql, $uid, $cuid, $ticketId, $check_val, $post_dated, $check_date, time());
+				$sql = "INSERT INTO {pos_api_expose_check_log} (uid, cuid, ticket_id, paid_amount, post_dated, cash_date, `timestamp`, check_number) VALUES ('%d', '%d', '%d', '%s', '%d', '%s', '%s', '%s')";
+				db_query($sql, $uid, $cuid, $ticketId, $check_val, $post_dated, $check_date, time(), $check_number);
 				$check_pid = db_last_insert_id('pos_api_expose_check_log', 'pid');
 			}
 
