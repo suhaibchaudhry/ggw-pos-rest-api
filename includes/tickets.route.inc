@@ -1089,9 +1089,15 @@ function pos_api_expose_rma_refund() {
 
 			if($products) {
 				foreach($products as $product) {
-					db_query("INSERT INTO {pos_api_expose_rma_returned_products} (order_product_id, qty_returned, refund_log_pid, price) VALUES ('%d', '%d', '%d', '%s')", $product->order_product_id, $product->qty_returned, $rma_pid, $product->price);
+					if($product->historic) {
+						db_query("INSERT INTO {pos_api_expose_rma_returned_products} (order_product_id, qty_returned, refund_log_pid, price) VALUES ('%d', '%d', '%d', '%s')", $product->order_product_id, $product->qty_returned, $rma_pid, $product->price);
 
-					db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $product->nid, (-1)*$product->qty_returned, $product->price, time());
+						db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $product->nid, (-1)*$product->qty_returned, $product->price, time());
+					} else {
+						db_query("INSERT INTO {pos_api_expose_rma_returned_products} (order_product_id, qty_returned, refund_log_pid, price) VALUES ('%d', '%d', '%d', '%s')", 0, $product->qty_returned, $rma_pid, $product->price);
+
+						db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $product->order_product_id, (-1)*$product->qty_returned, $product->price, time());
+					}
 				}
 			}
 
