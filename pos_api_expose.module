@@ -181,6 +181,15 @@ function pos_api_expose_menu() {
       'file' => 'includes/tickets.route.inc'
     );
 
+    $routers['pos-api/ticket/credit-cash-checkout'] = array(
+      'title' => 'Credit Cash Checkout',
+      'description' => 'Checkout credit payments with cash.',
+      'page callback' => 'pos_api_expose_credit_cash_checkout',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
+
     $routers['pos-api/ticket/rma-checkout'] = array(
       'title' => 'Customer RMA Checkout',
       'description' => 'Checkout customer RMA ticket.',

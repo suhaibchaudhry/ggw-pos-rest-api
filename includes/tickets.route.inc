@@ -889,7 +889,7 @@ function pos_api_expose_ticket_partial_checkout() {
 function pos_api_expose_ticket_cash_checkout() {
 	$failed_response = array(
 		'status' => false,
-		'error' => 'Could not checkout ticket, please check network and try again.'
+		'message' => 'Could not checkout ticket, please check network and try again.'
 	);
 
 	if(array_key_exists('request', $_POST)) {
@@ -961,6 +961,69 @@ function pos_api_expose_ticket_cash_checkout() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_credit_cash_checkout() {
+	$failed_response = array(
+		'status' => false,
+		'message' => 'Could not complete payment, please check network and try again.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			$cash = $request->cash;
+			$change = $request->change;
+			$cuid = $request->customer;
+
+			$cash_value = $request->cash_val;
+
+			$check = $request->check;
+			$check_val = $request->check_val;
+			$check_number = $request->check_number;
+			$post_dated = $request->check_post_dated;
+			$check_date = $request->check_date;
+
+			$mo = $request->mo;
+			$mo_val = $request->mo_val;
+			$mo_ref = $request->mo_ref;
+
+			$credit = $request->credit;
+			$credit_val = $request->credit_val;
+			$transac_id = $request->transac_id;
+			$register_id = $request->register_id;
+
+			$settlement_amount = ((float)$cash)-((float)$change);
+
+			if($cuid) {
+				$pending_usages = db_query("SELECT cuid, credit_amount FROM {user_term_credits_usages} WHERE uid = '%d' AND settled = '0'", $cuid);
+				while($usage = db_fetch_object($pending_usages)) {
+					if($settlement_amount > 0 && $settlement_amount < $usage->credit_amount) {
+						db_query("INSERT INTO {user_term_credits_settlements}
+							(cuid, settlement_amount, payment_type, remarks, settlement_date)
+							VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', '', time());
+						break;
+					} else if($settlement_amount <= 0) {
+						break;
+					} else {
+						db_query("INSERT INTO {user_term_credits_settlements}
+							(cuid, settlement_amount, payment_type, remarks, settlement_date)
+							VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', '', time());
+						db_query("UPDATE {user_term_credits_usages} SET settled = '1' WHERE cuid = '%d'", $usage->cuid);
+						$settlement_amount = $settlement_amount-$usage->credit_amount;
+					}
+				}
+
+				pos_api_expose_respond(
+				array("status" => true,
+					  "message" => "Payment was made successfully.")
+				, true);
+			}
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function _pos_api_expose_stock_adjustment($ticketId) {
 	$products = db_query("SELECT nid, qty, price FROM {uc_order_products} WHERE order_id = '%d'", $ticketId);
 
@@ -972,7 +1035,7 @@ function _pos_api_expose_stock_adjustment($ticketId) {
 function pos_api_expose_credit_checkout() {
 	$failed_response = array(
 		'status' => false,
-		'error' => 'Could not checkout ticket, please check network and try again.'
+		'message' => 'Could not checkout ticket, please check network and try again.'
 	);
 
 	if(array_key_exists('request', $_POST)) {
