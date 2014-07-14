@@ -138,14 +138,63 @@ function pos_api_rma_process() {
 
 					pos_api_expose_respond($response, true);
 				} else {
-					$failed_response = array(
-						'status' => false,
-						'error' => 'Item was not found in customer history.'
-					);
+					$additional_barcode_sql = "SELECT cfab.nid FROM {content_field_additional_barcodes} cfab WHERE cfab.field_additional_barcodes_value = '%s'";
+
+					$sku_sql = "SELECT p.nid
+								FROM {uc_products} p
+								LEFT JOIN {content_type_product} ctp ON p.nid = ctp.nid
+								WHERE p.model = '%s' OR
+								  ctp.field_prod_unit_barcode_value = '%s' OR
+								  p.nid IN (".$additional_barcode_sql.")";
+
+
+					$sql = 'SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value
+						FROM {uc_products} p
+						INNER JOIN {node} n ON n.vid = p.vid
+
+						LEFT JOIN {content_field_image_cache} cfic ON n.vid = cfic.vid
+						LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
+						LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
+
+						INNER JOIN ('.$sku_sql.') fts ON n.nid = fts.nid
+
+						WHERE n.status > 0
+						LIMIT 0, 48';
+
+					$products = array();
+					$items = db_query($sql, $item_barcode, $item_barcode, $item_barcode);
+
+					if($items) {
+						while($item = db_fetch_object($items)) {
+							$products[] = _pos_api_expose_map_product_datum($item);
+						}
+
+						if(count($products) > 0) {
+							$failed_response = array(
+								'status' => false,
+								'error_forgive' => true,
+								'products' => $products,
+								'error' => 'Item was not found but not in customer history.'
+							);
+						} else {
+							$failed_response = array(
+								'status' => false,
+								'error_forgive' => false,
+								'error' => 'Item was not found in customer history and in products.'
+							);
+						}
+					} else {
+						$failed_response = array(
+							'status' => false,
+							'error_forgive' => false,
+							'error' => 'Item was not found in customer history and in products.'
+						);
+					}
 				}
 			} else {
 				$failed_response = array(
 					'status' => false,
+					'error_forgive' => false,
 					'error' => 'Item was not found in customer history.'
 				);
 			}
