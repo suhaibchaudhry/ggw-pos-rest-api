@@ -172,6 +172,15 @@ function pos_api_expose_menu() {
       'file' => 'includes/tickets.route.inc'
     );
 
+    $routers['pos-api/ticket/partial-swipe-checkout'] = array(
+      'title' => 'Partial Credit Card Swipe Checkout',
+      'description' => 'Checkout RPC for magnetic card swipe with cash.',
+      'page callback' => 'pos_api_expose_ticket_partial_checkout',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
+
     $routers['pos-api/ticket/rma-checkout'] = array(
       'title' => 'Customer RMA Checkout',
       'description' => 'Checkout customer RMA ticket.',

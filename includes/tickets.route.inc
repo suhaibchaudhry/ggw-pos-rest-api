@@ -754,6 +754,138 @@ function pos_api_expose_ticket_swipe_checkout() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_ticket_partial_checkout() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not checkout ticket, please check network and try again.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$uid = _pos_api_expose_uid_from_token($request->token);
+
+		if($uid) {
+			module_load_include('php', 'pos_api_expose', 'includes/anet_php_sdk/AuthorizeNet');
+
+			$test_mode = variable_get('pos_api_expose_testing_enabled', 1);
+			if($test_mode) {
+				$api_login = variable_get('pos_api_expose_login_id_test', '');
+				$transac_key = variable_get('pos_api_expose_transac_key_test', '');
+				define("AUTHORIZENET_SANDBOX", true);
+			} else {
+				$api_login = variable_get('pos_api_expose_login_id', '');
+				$transac_key = variable_get('pos_api_expose_transac_key', '');
+				define("AUTHORIZENET_SANDBOX", false);
+			}
+
+			if( !empty($transac_key) && !empty($api_login) ) {
+				define("AUTHORIZENET_API_LOGIN_ID", $api_login);
+				define("AUTHORIZENET_TRANSACTION_KEY", $transac_key);
+
+				$ticketId = $request->ticketId;
+				$total = $request->total;
+				$cash = $request->cash;
+				$change = $request->change;
+				$cuid = $request->customer;
+
+				$cash_value = $request->cash_val;
+
+				$check = $request->check;
+				$check_val = $request->check_val;
+				$check_number = $request->check_number;
+				$post_dated = $request->check_post_dated;
+				$check_date = $request->check_date;
+
+				$mo = $request->mo;
+				$mo_val = $request->mo_val;
+				$mo_ref = $request->mo_ref;
+
+				//$credit = $request->credit;
+				//$credit_val = $request->credit_val;
+				//$transac_id = $request->transac_id;
+				$remaining = $request->remaining_balance;
+				$register_id = $request->register_id;
+
+				$cardData = $request->cardData;
+
+				if($cardData->hasTrack1 || $cardData->hasTrack2) {
+					$sale = new AuthorizeNetAIM;
+					$sale->amount = $remaining;
+					$sale->card_num = $cardData->account;
+					$sale->exp_date = $cardData->exp_month.'/'.$cardData->exp_year;
+
+					if($cardData->hasTrack1) {
+						$sale->first_name = $cardData->first_name;
+						$sale->last_name = $cardData->last_name;
+					}
+
+					$response = $sale->authorizeAndCapture();
+
+					if ($response->approved) {
+						$sql = "INSERT INTO {pos_api_expose_credit_card_log} (uid, cuid, ticket_id, amount_paid, transaction_id, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', %s)";
+						db_query($sql, $uid, $cuid, $ticketId, $remaining, $response->transaction_id, time());
+
+						$credit_pid = db_last_insert_id('pos_api_expose_credit_card_log', 'pid');
+
+						//Cash values
+						$sql = "INSERT INTO {pos_api_expose_cash_log} (uid, cuid, ticket_id, amount_paid, `change`, total, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', '%s', '%s')";
+						//When change is sent to credits it will be 0 here.
+						db_query($sql, $uid, $cuid, $ticketId, $cash_value, $change, $total, time());
+						$cash_pid = db_last_insert_id('pos_api_expose_cash_log', 'pid');
+
+						$check_pid = 0;
+						if($check) {
+							$sql = "INSERT INTO {pos_api_expose_check_log} (uid, cuid, ticket_id, paid_amount, post_dated, cash_date, `timestamp`, check_number) VALUES ('%d', '%d', '%d', '%s', '%d', '%s', '%s', '%s')";
+							db_query($sql, $uid, $cuid, $ticketId, $check_val, $post_dated, $check_date, time(), $check_number);
+							$check_pid = db_last_insert_id('pos_api_expose_check_log', 'pid');
+						}
+
+						$mo_pid = 0;
+						if($mo) {
+							$sql = "INSERT INTO {pos_api_expose_money_order_log} (uid, cuid, ticket_id, paid_amount, reference, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', '%s')";
+							db_query($sql, $uid, $cuid, $ticketId, $mo_val, $mo_ref, time());
+							$mo_pid = db_last_insert_id('pos_api_expose_money_order_log', 'pid');
+						}
+
+						$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`)
+							VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s')";
+						db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time());
+
+						_pos_api_expose_stock_adjustment($ticketId);
+
+						pos_api_expose_respond(
+							array("status" => true,
+								  "message" => "Credit card payment successful.")
+						, true);
+					} else {
+						pos_api_expose_respond(array(
+							'status' => false,
+							'error' => $response->response_reason_text
+						), true);
+					}
+				} else {
+					pos_api_expose_respond(array(
+						'status' => false,
+						'error' => 'We could not read this card, please try again.'
+					), true);
+				}
+			} else {
+				pos_api_expose_respond(array(
+					'status' => false,
+					'error' => 'Credit card processing has not been configured.'
+				), true);
+			}
+		} else {
+			pos_api_expose_respond(array(
+				'status' => false,
+				'error' => 'You do not have permission to conduct this operation.'
+			), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_ticket_cash_checkout() {
 	$failed_response = array(
 		'status' => false,
