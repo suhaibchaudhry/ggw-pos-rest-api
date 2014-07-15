@@ -1063,6 +1063,69 @@ function pos_api_expose_credit_checkout() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_rma_create_ticket() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not create RMA ticket, please check network and try again.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			$order = new stdClass();
+			$order->uid = $request->customer_uid;
+			$order->order_status = 'pos_return'; //Open New ticket as a quote ticket
+			$order->order_total = 0;
+			$order->product_count = 0;
+			$order->delivery_zone = 0;
+			$order->delivery_country = 840;
+			$order->billing_zone = 0;
+			$order->billing_country = 840;
+			$order->data = array();
+			$order->created = time();
+			$order->modified = time();
+			$order->host = ip_address();
+			$order->currency = 'USD';
+
+			drupal_write_record('uc_orders', $order);
+
+			foreach($request->products as $product) {
+				$order_product = new stdClass();
+				$order_product->order_id = $order->order_id;
+				$order_product->nid = $product->nid;
+				$order_product->title = $product->name;
+				$order_product->model = $product->sku;
+				$order_product->price = $product->price;
+
+				$order_product->cost = pos_stock_management_average_cost($order_product->nid);
+				if(empty($order_product->cost)) {
+					//Use default automagic cost.
+					$order_product->cost = db_result(db_query("SELECT cost FROM {uc_products} WHERE nid = '%d'", $order_product->nid));
+				}
+
+				$order_product->manufacturer = '';
+				$order_product->weight = 0;
+				$order_product->qty = $product->qty_returned;
+				$order_product->data = array(
+					'attributes' => array()
+				);
+
+				drupal_write_record('uc_order_products', $order_product);
+			}
+
+			pos_api_expose_respond(
+				array("status" => true,
+					  "ticketId" => $order->order_id,
+					  "ticketStatus" => 'pos_return',
+					  "message" => "RMA ticket created.")
+				, true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_rma_refund() {
 	$failed_response = array(
 		'status' => false,
