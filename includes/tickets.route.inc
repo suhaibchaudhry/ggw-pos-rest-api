@@ -994,20 +994,40 @@ function pos_api_expose_credit_cash_checkout() {
 
 			$settlement_amount = ((float)$cash)-((float)$change);
 
+			$breakdown = "CASH|".$cash_value."\n";
+			$breakdown .= "CHECK|".$check_val."\n";
+			$breakdown .= "MO|".$mo_val."\n";
+			$breakdown .= "CC|".$credit_val."\n";
+			$breakdown .= "CHANGE|".$change;
+
+			$breakdown_set = false;
+
 			if($cuid) {
 				$pending_usages = db_query("SELECT cuid, credit_amount FROM {user_term_credits_usages} WHERE uid = '%d' AND settled = '0'", $cuid);
 				while($usage = db_fetch_object($pending_usages)) {
 					if($settlement_amount > 0 && $settlement_amount < $usage->credit_amount) {
+						if($breakdown_set) {
+							$remarks = '';
+						} else {
+							$remarks = $breakdown;
+							$breakdown_set = true;
+						}
 						db_query("INSERT INTO {user_term_credits_settlements}
 							(cuid, settlement_amount, payment_type, remarks, settlement_date)
-							VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', '', time());
+							VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', $remarks, time());
 						break;
 					} else if($settlement_amount <= 0) {
 						break;
 					} else {
+						if($breakdown_set) {
+							$remarks = '';
+						} else {
+							$remarks = $breakdown;
+							$breakdown_set = true;
+						}
 						db_query("INSERT INTO {user_term_credits_settlements}
 							(cuid, settlement_amount, payment_type, remarks, settlement_date)
-							VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', '', time());
+							VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', $remarks, time());
 						db_query("UPDATE {user_term_credits_usages} SET settled = '1' WHERE cuid = '%d'", $usage->cuid);
 						$settlement_amount = $settlement_amount-$usage->credit_amount;
 					}
