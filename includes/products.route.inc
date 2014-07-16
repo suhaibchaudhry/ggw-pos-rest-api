@@ -267,7 +267,7 @@ function pos_api_expose_load_ticket_products() {
 		if($uid) {
 			_pos_api_expose_log_ticket_load($uid, $ticketId);
 			
-			$sql = "SELECT n.nid, n.vid, n.title, p.model, p.list_price, p.sell_price, f.filepath, ctp_wrap.field_prod_packing_value, uo.qty, uo.order_product_id
+			$sql = "SELECT n.nid, n.vid, n.title, p.model, p.list_price, uo.price AS sell_price, f.filepath, ctp_wrap.field_prod_packing_value, uo.qty, uo.order_product_id
 			FROM {uc_order_products} uo
 
 			INNER JOIN {uc_products} p ON p.nid = uo.nid
