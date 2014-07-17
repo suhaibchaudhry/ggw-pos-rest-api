@@ -33,9 +33,10 @@ function _pos_api_expose_map_product_datum($item, $special_price = true, $ticket
 		$product['order_product_id'] = $item->order_product_id;
 
 		if($ticketId) {
-			$price = db_result(db_query("SELECT mol.unit_price FROM {pos_api_expose_manager_override_log} mol WHERE mol.ticket_id = '%d' AND mol.product_nid = '%d' ORDER BY `timestamp` DESC", $ticketId, $item->order_product_id));
+			$price = db_fetch_object(db_query("SELECT mol.unit_price, mol.qty_split FROM {pos_api_expose_manager_override_log} mol WHERE mol.ticket_id = '%d' AND mol.product_nid = '%d' ORDER BY `timestamp` DESC", $ticketId, $item->order_product_id));
 			if($price) {
-				$product['manager_price'] = $price;
+				$product['manager_price'] = $price->unit_price;
+				$product['qty_split'] = $price->qty_split;
 			}
 		}
 	}
@@ -129,6 +130,11 @@ function pos_api_rma_process() {
 				$products = array();
 
 				while($item = db_fetch_object($items)) {
+					$price = db_fetch_object(db_query("SELECT mol.unit_price, mol.qty_split FROM {pos_api_expose_manager_override_log} mol WHERE mol.ticket_id = '%d' AND mol.product_nid = '%d' ORDER BY `timestamp` DESC", $item->order_id, $item->order_product_id));
+					if($price) {
+						$item->price = $price->unit_price;
+						//$product['qty_split'] = $price->qty_split;
+					}
 					$products[] = _pos_api_expose_map_product_rma($item);
 				}
 
@@ -356,6 +362,9 @@ function pos_api_expose_product_scan() {
 		$token = $request->token;
 		$barcode = trim($request->barcode);
 
+		$sell_price = $request->sell_price;
+		$rma_scan = $request->rma_scan;
+
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
 			$additional_barcode_sql = "SELECT cfab.vid FROM {content_field_additional_barcodes} cfab WHERE cfab.field_additional_barcodes_value = '%s'";
@@ -379,7 +388,9 @@ function pos_api_expose_product_scan() {
 					LIMIT 0, 1';
 
 			$product = db_fetch_object(db_query($sql, $barcode, $barcode, $barcode));
-
+			if($rma_scan) {
+				$product->sell_price = $sell_price;
+			}
 			$datum = _pos_api_expose_map_product_datum($product);
 
 			if($product) {

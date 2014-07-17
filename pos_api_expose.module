@@ -40,10 +40,10 @@ function pos_api_expose_menu() {
   	$routers['pos-api/product-scan'] = array(
   		'title' => 'Scan Product Barcode',
   		'description' => 'Search for products by a barcode.',
-		'page callback' => 'pos_api_expose_product_scan',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/products.route.inc'
+		  'page callback' => 'pos_api_expose_product_scan',
+		  'access arguments' => array('access content'),
+		  'type' => MENU_CALLBACK,
+		  'file' => 'includes/products.route.inc'
   	);
 
   	$routers['pos-api/ticket-statuses'] = array(
