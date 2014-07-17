@@ -647,6 +647,45 @@ function pos_api_expose_ticket_update_totals() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_update_rma_refund() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not update rma refund, please check network and try again.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+		$customer_uid = $request->customer_uid;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			if($ticketId) {
+				pos_api_expose_ticket_update_total_on_server($ticketId);
+				$subtotal = db_result(db_query("SELECT (-1)*(uo.order_total-IFNULL(t.tax, 0)) AS subtotal FROM uc_orders uo
+					LEFT JOIN (SELECT order_id, SUM(amount) AS tax FROM uc_order_line_items GROUP BY order_id) t
+					ON uo.order_id = t.order_id WHERE uo.order_id = '%d'", $ticketId));
+
+				if($subtotal < 0) {
+					$time = time();
+
+					db_query("DELETE FROM user_term_credits_usages WHERE order_id = '%d'", $ticketId);
+					db_query("INSERT INTO user_term_credits_usages (uid, order_id, credit_amount, consumption_date, due_date)
+						VALUES ('%d', '%d', '%s', '%s', '%s')", $customer_uid, $ticketId, $subtotal, $time, $time);
+
+					pos_api_expose_respond(array('status' => true,
+											 'message' => 'RMA ticket was re-processed.'), true);
+				} else {
+					pos_api_expose_respond(array('status' => true,
+											 'message' => 'RMA tickets must amount to more than $0.00 to be re-processed.'), true);
+				}
+			}
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_ticket_update_zone() {
 	$failed_response = array(
 		'status' => false,
@@ -1005,31 +1044,33 @@ function pos_api_expose_credit_cash_checkout() {
 			if($cuid) {
 				$pending_usages = db_query("SELECT cuid, credit_amount FROM {user_term_credits_usages} WHERE uid = '%d' AND settled = '0'", $cuid);
 				while($usage = db_fetch_object($pending_usages)) {
-					if($settlement_amount > 0 && $settlement_amount < $usage->credit_amount) {
-						if($breakdown_set) {
-							$remarks = '';
+					if($usage->credit_amount > 0) {
+						if($settlement_amount > 0 && $settlement_amount < $usage->credit_amount) {
+							if($breakdown_set) {
+								$remarks = '';
+							} else {
+								$remarks = $breakdown;
+								$breakdown_set = true;
+							}
+							db_query("INSERT INTO {user_term_credits_settlements}
+								(cuid, settlement_amount, payment_type, remarks, settlement_date)
+								VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', $remarks, time());
+							break;
+						} else if($settlement_amount <= 0) {
+							break;
 						} else {
-							$remarks = $breakdown;
-							$breakdown_set = true;
+							if($breakdown_set) {
+								$remarks = '';
+							} else {
+								$remarks = $breakdown;
+								$breakdown_set = true;
+							}
+							db_query("INSERT INTO {user_term_credits_settlements}
+								(cuid, settlement_amount, payment_type, remarks, settlement_date)
+								VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', $remarks, time());
+							db_query("UPDATE {user_term_credits_usages} SET settled = '1' WHERE cuid = '%d'", $usage->cuid);
+							$settlement_amount = $settlement_amount-$usage->credit_amount;
 						}
-						db_query("INSERT INTO {user_term_credits_settlements}
-							(cuid, settlement_amount, payment_type, remarks, settlement_date)
-							VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', $remarks, time());
-						break;
-					} else if($settlement_amount <= 0) {
-						break;
-					} else {
-						if($breakdown_set) {
-							$remarks = '';
-						} else {
-							$remarks = $breakdown;
-							$breakdown_set = true;
-						}
-						db_query("INSERT INTO {user_term_credits_settlements}
-							(cuid, settlement_amount, payment_type, remarks, settlement_date)
-							VALUES ('%d', '%s', '%s', '%s', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', $remarks, time());
-						db_query("UPDATE {user_term_credits_usages} SET settled = '1' WHERE cuid = '%d'", $usage->cuid);
-						$settlement_amount = $settlement_amount-$usage->credit_amount;
 					}
 				}
 

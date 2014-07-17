@@ -40,10 +40,10 @@ function pos_api_expose_menu() {
   	$routers['pos-api/product-scan'] = array(
   		'title' => 'Scan Product Barcode',
   		'description' => 'Search for products by a barcode.',
-		  'page callback' => 'pos_api_expose_product_scan',
-		  'access arguments' => array('access content'),
-		  'type' => MENU_CALLBACK,
-		  'file' => 'includes/products.route.inc'
+		'page callback' => 'pos_api_expose_product_scan',
+		'access arguments' => array('access content'),
+		'type' => MENU_CALLBACK,
+		'file' => 'includes/products.route.inc'
   	);
 
   	$routers['pos-api/ticket-statuses'] = array(
@@ -121,11 +121,20 @@ function pos_api_expose_menu() {
   	$routers['pos-api/ticket/update-total'] = array(
   		'title' => 'Update Ticket Totals',
   		'description' => 'Update a ticket totals.',
-		'page callback' => 'pos_api_expose_ticket_update_totals',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
+		  'page callback' => 'pos_api_expose_ticket_update_totals',
+		  'access arguments' => array('access content'),
+		  'type' => MENU_CALLBACK,
+		  'file' => 'includes/tickets.route.inc'
   	);
+
+    $routers['pos-api/ticket/reprocess-rma'] = array(
+      'title' => 'Update RMA Refunds',
+      'description' => 'Update a refund amount on an rma ticket.',
+      'page callback' => 'pos_api_expose_update_rma_refund',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
 
   	$routers['pos-api/ticket/update-status'] = array(
   		'title' => 'Update Ticket Status',
