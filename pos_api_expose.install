@@ -329,6 +329,13 @@ function pos_api_expose_schema() {
 		        'not null' => TRUE,
 		        'default' => 0.0,
 			),
+			'rma_ticket_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "RMA ticket id."
+			),
 			'timestamp' => array(
 				'description' => 'The Unix timestamp when event took place was created.',
         		'type' => 'int',
@@ -454,6 +461,13 @@ function pos_api_expose_schema() {
 		        'scale' => 5,
 		        'not null' => TRUE,
 		        'default' => 0.0,
+			),
+			'rma_ticket_id' => array(
+				'type' => 'int',
+        		'not null' => TRUE,
+        		'default' => 0,
+				'unsigned' => TRUE,
+				'description' => "RMA ticket id."
 			)
 		),
 		'primary key' => array('rid')
@@ -652,4 +666,22 @@ function pos_api_expose_update_6015() {
 	);
 
 	db_add_field($ret, $table, $field_name, $field, array());
+}
+
+function pos_api_expose_update_6016() {
+	$ret = array();
+
+	$table = 'pos_api_expose_rma_refund_log';
+	$table2 = 'pos_api_expose_rma_returned_products';
+	$field_name = 'rma_ticket_id';
+	$field = array(
+		'description' => t('RMA ticket id.'),
+		'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+		'unsigned' => TRUE
+	);
+
+	db_add_field($ret, $table, $field_name, $field, array());
+	db_add_field($ret, $table2, $field_name, $field, array());
 }

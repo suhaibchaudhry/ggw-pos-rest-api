@@ -117,7 +117,7 @@ function pos_api_rma_process() {
 							  ctp.field_prod_unit_barcode_value = '%s' OR
 							  p.nid IN (".$additional_barcode_sql.")";
 
-			$items = db_query("SELECT uop.order_product_id, uo.created, uop.order_id, uop.nid, uop.title, uop.model, uop.price, uop.qty, ctp.field_prod_packing_value, f.filepath, (uop.qty-rma.qty_returned) AS remaining_qty
+			$items = db_query("SELECT uop.order_product_id, uo.created, uop.order_id, uop.nid, uop.title, uop.model, uop.price, uop.qty, ctp.field_prod_packing_value, f.filepath, (uop.qty-IFNULL(rma.qty_returned,0)) AS remaining_qty
 				FROM {uc_order_products} uop
 				INNER JOIN {uc_orders} uo ON uop.order_id = uo.order_id
 				LEFT JOIN {content_type_product} ctp ON uop.nid = ctp.nid

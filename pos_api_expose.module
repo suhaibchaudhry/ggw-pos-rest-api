@@ -136,6 +136,15 @@ function pos_api_expose_menu() {
       'file' => 'includes/tickets.route.inc'
     );
 
+    $routers['pos-api/ticket/process-rma'] = array(
+      'title' => 'Process an RMA ticket.',
+      'description' => 'Update a refund amount on an rma ticket.',
+      'page callback' => 'pos_api_expose_process_rma',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
+
   	$routers['pos-api/ticket/update-status'] = array(
   		'title' => 'Update Ticket Status',
   		'description' => 'Update a ticket status.',
