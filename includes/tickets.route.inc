@@ -624,6 +624,11 @@ function pos_api_expose_ticket_update_total_on_server($ticketId) {
 	uc_order_load($ticketId);
 }
 
+function pos_api_expose_get_order_total($ticketId) {
+	pos_api_expose_ticket_update_total_on_server($ticketId);
+	return db_result(db_query("SELECT order_total FROM uc_orders WHERE order_id = '%d'", $ticketId));
+}
+
 function pos_api_expose_ticket_update_totals() {
 	$failed_response = array(
 		'status' => false,
@@ -825,7 +830,7 @@ function pos_api_expose_ticket_swipe_checkout() {
 
 				$ticketId = $request->ticketId;
 				$cuid = $request->customer;
-				$total = $request->total;
+				$total = pos_api_expose_get_order_total($ticketId);
 				$register_id = $request->register_id;
 
 				$cardData = $request->cardData;
@@ -910,7 +915,7 @@ function pos_api_expose_ticket_partial_checkout() {
 				define("AUTHORIZENET_TRANSACTION_KEY", $transac_key);
 
 				$ticketId = $request->ticketId;
-				$total = $request->total;
+				$total = pos_api_expose_get_order_total($ticketId);
 				$cash = $request->cash;
 				$change = $request->change;
 				$cuid = $request->customer;
@@ -1022,7 +1027,7 @@ function pos_api_expose_ticket_cash_checkout() {
 	if(array_key_exists('request', $_POST)) {
 		$request = json_decode($_POST['request']);
 		$ticketId = $request->ticketId;
-		$total = $request->total;
+		$total = pos_api_expose_get_order_total($ticketId);
 		$cash = $request->cash;
 		$change = $request->change;
 		$cuid = $request->customer;
@@ -1196,7 +1201,7 @@ function pos_api_expose_credit_checkout() {
 	if(array_key_exists('request', $_POST)) {
 		$request = json_decode($_POST['request']);
 		$ticketId = $request->ticketId;
-		$total = $request->total;
+		$total = pos_api_expose_get_order_total($ticketId);
 		$cuid = $request->customer;
 		$term_limit = $request->term_limit;
 		$register_id = $request->register_id;
