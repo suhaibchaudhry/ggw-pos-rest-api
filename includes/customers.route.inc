@@ -101,7 +101,8 @@ function pos_api_expose_customer_info() {
 				$customer_info = user_view($customer);
 				$invoices = _pos_api_expose_order_history($customer);
 				$payments = utc_credit_report_pos($customer);
-				pos_api_expose_respond(array('status' => true, 'customer_info' => $customer_info, 'invoices' => $invoices, 'payments' => $payments), true);
+				$rma_credits = db_result(db_query("SELECT IFNULL(SUM(total_refund),0) FROM {pos_api_expose_rma_refund_log} WHERE cuid = '%d' AND credit_usage_id = '0'", $customer_uid));
+				pos_api_expose_respond(array('status' => true, 'customer_info' => $customer_info, 'invoices' => $invoices, 'payments' => $payments, 'rma_credits' => uc_currency_format($rma_credits)), true);
 			}
 		}
 	}
