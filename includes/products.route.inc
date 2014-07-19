@@ -365,7 +365,7 @@ function pos_api_expose_product_scan() {
 		$barcode = trim($request->barcode);
 
 		$sell_price = $request->sell_price;
-		$rma_scan = $request->rma_scan;
+		/*$rma_scan = $request->rma_scan;*/
 
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
@@ -390,9 +390,11 @@ function pos_api_expose_product_scan() {
 					LIMIT 0, 1';
 
 			$product = db_fetch_object(db_query($sql, $barcode, $barcode, $barcode));
+			/*
 			if($rma_scan) {
 				$product->sell_price = $sell_price;
 			}
+			*/
 			$datum = _pos_api_expose_map_product_datum($product);
 
 			if($product) {
