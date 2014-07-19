@@ -1119,10 +1119,14 @@ function pos_api_expose_credit_cash_checkout() {
 			$transac_id = $request->transac_id;
 			$register_id = $request->register_id;
 
-			$settlement_amount = ((float)$cash)-((float)$change);
+			$settlement_amount = ((double)$cash)-((double)$change);
 
 			$breakdown = "CASH|".$cash_value."\n";
-			$breakdown .= "CHECK|".$check_val."\n";
+			if($post_dated) {
+				$breakdown .= "PCHECK|".$check_val."\n";
+			} else {
+				$breakdown .= "CHECK|".$check_val."\n";
+			}
 			$breakdown .= "MO|".$mo_val."\n";
 			$breakdown .= "CC|".$credit_val."\n";
 			$breakdown .= "CHANGE|".$change;
