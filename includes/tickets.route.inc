@@ -704,7 +704,7 @@ function pos_api_expose_process_rma() {
 					}
 				}
 
-				db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled) VALUES ('%d', '%d', '-%s', '0', '%s', '%s', '0')", $customer_uid, $ticketId, $amount_returned, time(), time());
+				db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled) VALUES ('%d', '%d', '-%s', '0', '%s', '%s', '1')", $customer_uid, $ticketId, $amount_returned, time(), time());
 				
 				$credit_usage_id = $rma_pid = db_last_insert_id('user_term_credits_usages', 'cuid');
 				
@@ -1130,7 +1130,7 @@ function pos_api_expose_credit_cash_checkout() {
 			if($cuid) {
 				$pending_usages = db_query("SELECT u.cuid, (credit_amount-IFNULL(pre.paid, 0)) AS credit_amount FROM user_term_credits_usages u
 						LEFT JOIN (SELECT cuid, SUM(settlement_amount) AS paid FROM user_term_credits_settlements GROUP BY cuid) pre ON u.cuid = pre.cuid  
-						WHERE u.uid = '%d' AND settled = '0'", $cuid);
+						WHERE u.uid = '%d' AND settled = '0' AND u.credit_amount > 0", $cuid);
 				while($usage = db_fetch_object($pending_usages)) {
 					if($usage->credit_amount > 0) {
 						if($settlement_amount <= 0) {

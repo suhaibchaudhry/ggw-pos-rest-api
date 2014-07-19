@@ -319,7 +319,7 @@ function pos_api_expose_rma_products() {
 		$request = json_decode($_POST['request']);
 		$token = $request->token;
 		$ticketId = $request->ticketId;
-
+		$total = 0;
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
 			$sql = "SELECT n.nid, n.vid, n.title, p.model, p.list_price, uop.price AS sell_price, f.filepath, ctp_wrap.field_prod_packing_value, rp.qty_returned AS qty
@@ -337,12 +337,14 @@ function pos_api_expose_rma_products() {
 			$products = db_query($sql, $ticketId);
 			$data = array();
 			while($product = db_fetch_object($products)) {
+				$total += $product->qty*$product->sell_price;
 				$data[] = _pos_api_expose_map_product_datum($product, false);
 			}
 
+			/*
 			$total = db_result(db_query("SELECT SUM(refunds.total_refund) FROM (SELECT DISTINCT rl.pid, uop.order_id, rl.total_refund FROM pos_api_expose_rma_refund_log rl
 					INNER JOIN pos_api_expose_rma_returned_products rp ON rl.pid = rp.refund_log_pid
-					INNER JOIN uc_order_products uop ON uop.order_product_id = rp.order_product_id) refunds WHERE refunds.order_id = '%d'", $ticketId));
+					INNER JOIN uc_order_products uop ON uop.order_product_id = rp.order_product_id) refunds WHERE refunds.order_id = '%d'", $ticketId));*/
 			
 			pos_api_expose_respond(array('status' => true, 'products' => $data, 'total' => $total), true);
 		}
