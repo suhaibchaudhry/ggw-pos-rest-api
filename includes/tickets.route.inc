@@ -662,12 +662,12 @@ function pos_api_expose_process_rma() {
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			if($ticketId) {
-				$return_logs = db_query("SELECT pid, credit_usage_id FROM {pos_api_expose_rma_refund_log} WHERE rma_ticket_id = '%d'", $ticketId);
-				while($return_log = db_fetch_object($return_logs)) {
-					db_query("DELETE FROM {pos_api_expose_transaction_log} WHERE rma_pid = '%d'", $return_log->pid);
-				}
+				//$return_logs = db_query("SELECT pid, credit_usage_id FROM {pos_api_expose_rma_refund_log} WHERE rma_ticket_id = '%d'", $ticketId);
+				//while($return_log = db_fetch_object($return_logs)) {
+					//db_query("DELETE FROM {pos_api_expose_transaction_log} WHERE rma_pid = '%d'", $return_log->pid);
+				//}
 
-				db_query("DELETE FROM {user_term_credits_usages} WHERE order_id = '%d'", $ticketId);
+				//db_query("DELETE FROM {user_term_credits_usages} WHERE order_id = '%d'", $ticketId);
 				db_query("DELETE FROM {pos_api_expose_rma_refund_log} WHERE rma_ticket_id = '%d'", $ticketId);
 				db_query("DELETE FROM {pos_api_expose_rma_returned_products} WHERE rma_ticket_id = '%d'", $ticketId);
 
@@ -704,12 +704,14 @@ function pos_api_expose_process_rma() {
 					}
 				}
 
-				db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled) VALUES ('%d', '%d', '-%s', '0', '%s', '%s', '1')", $customer_uid, $ticketId, $amount_returned, time(), time());
+				//Stop sending ticket to credit usages all together.
+				/*db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled) VALUES ('%d', '%d', '-%s', '0', '%s', '%s', '1')", $customer_uid, $ticketId, $amount_returned, time(), time());*/
+
+				//$credit_usage_id = $rma_pid = db_last_insert_id('user_term_credits_usages', 'cuid');
 				
-				$credit_usage_id = $rma_pid = db_last_insert_id('user_term_credits_usages', 'cuid');
-				
+				//Credit usage id will be used as rma used flag.
 				db_query("INSERT INTO {pos_api_expose_rma_refund_log} (uid, cuid, credit_usage_id, total_refund, rma_ticket_id, `timestamp`)
-					VALUES ('%d', '%d', '%d', '%s', '%d', '%s')", $uid, $customer_uid, $credit_usage_id, $amount_returned, $ticketId, time());
+					VALUES ('%d', '%d', '%d', '%s', '%d', '%s')", $uid, $customer_uid, 0, $amount_returned, $ticketId, time());
 				
 				$rma_pid = db_last_insert_id('pos_api_expose_rma_refund_log', 'pid');
 
