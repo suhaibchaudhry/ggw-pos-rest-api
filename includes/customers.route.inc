@@ -104,6 +104,26 @@ function pos_api_expose_customer_info_payments() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_customer_info_settlements() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not get customer payment info.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$customer_uid = $request->customer_uid;
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			if($customer_uid) {
+				pos_api_expose_respond(array('status' => true, 'payments' => utc_generate_credits_table($customer_uid, false, 10)), true);
+			}
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_customer_info() {
 	module_load_include('inc', 'user', 'user.pages');
 

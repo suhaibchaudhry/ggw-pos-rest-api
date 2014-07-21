@@ -301,6 +301,15 @@ function pos_api_expose_menu() {
       'file' => 'includes/customers.route.inc'
     );
 
+    $routers['pos-api/customer/settlement-list'] = array(
+      'title' => 'Customer Settlement Info',
+      'description' => 'Get customer info payments.',
+      'page callback' => 'pos_api_expose_customer_info_settlements',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/customers.route.inc'
+    );
+
   	$routers['pos-api/customer/credits'] = array(
   		'title' => 'Customer Credits',
   		'description' => 'Get customers credit summary object.',
