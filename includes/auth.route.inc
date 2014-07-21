@@ -28,6 +28,8 @@ function pos_api_expose_auth() {
 			$unprivileged = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid  = '".ROLE_FLOOR_AGENT."'", $user->uid));
 
 			$admin = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_DEVELOPER."')", $user->uid));
+
+			$last_ticket = db_fetch_object(db_query("SELECT tl.ticket_id, o.order_status, tl.uid FROM pos_api_expose_ticket_log tl INNER JOIN uc_orders o ON tl.ticket_id = o.order_id WHERE tl.uid = '%d' ORDER BY tl.timestamp DESC LIMIT 0,1", $user->uid));
 		}
 		
 		if($user->login_valid == 1 && ($privileged || $unprivileged)) {
@@ -65,6 +67,13 @@ function pos_api_expose_auth() {
 
 			$response['privileged'] = (bool)$privileged;
 			$response['admin'] = (bool)$admin;
+			if(property_exists($last_ticket, 'ticket_id')) {
+				$last_ticket->ticket_id = (int)$last_ticket->ticket_id;
+			}
+			if(property_exists($last_ticket, 'uid')) {
+				$last_ticket->uid = (int)$last_ticket->uid;
+			}
+			$response['last_ticket'] = $last_ticket;
 
 			//Send token back on authentication
 			$response['token'] = $token;
