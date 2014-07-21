@@ -286,11 +286,20 @@ function pos_api_expose_menu() {
   	$routers['pos-api/customer/info'] = array(
   		'title' => 'Customer Info',
   		'description' => 'Get customer info.',
-		'page callback' => 'pos_api_expose_customer_info',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/customers.route.inc'
+		  'page callback' => 'pos_api_expose_customer_info',
+		  'access arguments' => array('access content'),
+		  'type' => MENU_CALLBACK,
+		  'file' => 'includes/customers.route.inc'
   	);
+
+    $routers['pos-api/customer/info-payments'] = array(
+      'title' => 'Customer Info',
+      'description' => 'Get customer info payments.',
+      'page callback' => 'pos_api_expose_customer_info_payments',
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/customers.route.inc'
+    );
 
   	$routers['pos-api/customer/credits'] = array(
   		'title' => 'Customer Credits',
