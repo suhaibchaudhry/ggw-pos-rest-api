@@ -1126,6 +1126,8 @@ function pos_api_expose_credit_cash_checkout() {
 
 			$settlement_amount = ((double)$cash)-((double)$change);
 
+			$time = time();
+
 			$breakdown = "CASH|".$cash_value."\n";
 			if($post_dated) {
 				$breakdown .= "PCHECK|".$check_val."\n";
@@ -1155,7 +1157,7 @@ function pos_api_expose_credit_cash_checkout() {
 							}
 							db_query("INSERT INTO {user_term_credits_settlements}
 								(cuid, settlement_amount, payment_type, remarks, settlement_date, euid, register_id)
-								VALUES ('%d', '%s', '%s', '%s', '%s', '%d', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', $remarks, time(), $uid, $register_id);
+								VALUES ('%d', '%s', '%s', '%s', '%s', '%d', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', $remarks, $time, $uid, $register_id);
 							break;
 						} else {
 							if($breakdown_set) {
@@ -1166,7 +1168,7 @@ function pos_api_expose_credit_cash_checkout() {
 							}
 							db_query("INSERT INTO {user_term_credits_settlements}
 								(cuid, settlement_amount, payment_type, remarks, settlement_date, euid, register_id)
-								VALUES ('%d', '%s', '%s', '%s', '%s', '%d', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', $remarks, time(), $uid, $register_id);
+								VALUES ('%d', '%s', '%s', '%s', '%s', '%d', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', $remarks, $time, $uid, $register_id);
 							db_query("UPDATE {user_term_credits_usages} SET settled = '1' WHERE cuid = '%d'", $usage->cuid);
 							$settlement_amount = $settlement_amount-$usage->credit_amount;
 						}
