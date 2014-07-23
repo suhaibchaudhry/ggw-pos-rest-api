@@ -275,7 +275,7 @@ function pos_api_expose_customer_search($token, $query) {
 					(".$accountid_search.") UNION
 					(".$phone_searches.") UNION (".$address_search.") UNION (".$company_name."))
 					search ON search.vid = n.vid
-					WHERE n.type = 'profile' AND u.uid IN (".$allowed_customer_roles.")
+					WHERE n.type = 'profile' AND u.status = '1' AND u.uid IN (".$allowed_customer_roles.")
 					ORDER BY search.relevance DESC
 					LIMIT 0, 8";
 
