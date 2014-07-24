@@ -1177,7 +1177,9 @@ function pos_api_expose_credit_cash_checkout() {
 
 				pos_api_expose_respond(
 				array("status" => true,
-					  "message" => "Payment was made successfully.")
+					  "message" => "Payment was made successfully.",
+					  "cuid" => strval($cuid),
+					  "time" => strval($time))
 				, true);
 			}
 		}
