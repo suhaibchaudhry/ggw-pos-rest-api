@@ -391,6 +391,15 @@ function pos_api_expose_menu() {
       'file' => 'includes/tickets.route.inc'
     );
 
+    $routers['admin/invoice/print-reciept/%/%'] = array(
+      'title' => 'Printable invoice',
+      'page arguments' => array(3, 4),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'page callback' => 'pos_settlement_reciept',
+      'file' => 'includes/tickets.route.inc'
+    );
+
 	return $routers;
 }
 
@@ -446,6 +455,15 @@ function pos_api_expose_respond($response, $die = FALSE) {
 	if($die) {
 		die();
 	}
+}
+
+function pos_api_expose_theme() {
+  return array(
+    'settlement_reciept' => array(
+      'template' => 'templates/settlement-reciept',
+      'arguments' => array('payment' => null, 'breakdown' => null, 'customer' => null)
+    )
+  );
 }
 
 function _pos_api_expose_last_event($uid, $event_type) {

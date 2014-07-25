@@ -1379,6 +1379,43 @@ function pos_ticket_invoice($order_id) {
 	}
 }
 
+function pos_settlement_reciept($cuid, $timestamp) {
+	//Avoid Caching Invoice
+	header('Cache-Control: no-cache, no-store, must-revalidate'); // HTTP 1.1.
+	header('Pragma: no-cache'); // HTTP 1.0.
+	header('Expires: 0'); // Proxies.
+
+	$token = $_GET['token'];
+	$uid = _pos_api_expose_uid_from_token($token);
+	if($uid) {
+		$payment = db_fetch_object(db_query("SELECT cs.sid, cs.settlement_date, SUM(cs.settlement_amount) AS paid, cs.remarks
+							FROM user_term_credits_settlements cs
+							INNER JOIN user_term_credits_usages cu ON cs.cuid = cu.cuid
+							WHERE cu.uid = '%d' AND cs.settlement_date = '%s'", $cuid, $timestamp));
+		if($payment->sid) {
+			$payments = array();
+
+			$payments_breakdown = db_query("SELECT cs.sid, cs.settlement_amount, cu.credit_amount, cu.order_id, (cs.settlement_date-cu.consumption_date) AS days, (cu.credit_amount-IFNULL(pre.paid, 0)) AS balance
+								FROM user_term_credits_settlements cs
+								INNER JOIN user_term_credits_usages cu ON cs.cuid = cu.cuid
+	                                        LEFT JOIN (SELECT cuid, SUM(settlement_amount) AS paid FROM user_term_credits_settlements GROUP BY cuid) pre ON cu.cuid = pre.cuid 
+								WHERE cu.uid = '%d' AND cs.settlement_date = '%s'", $cuid, $timestamp);
+
+			while($partial = db_fetch_object($payments_breakdown)) {
+				$payments[] = $partial;
+			}
+
+			$customer = user_load($cuid);
+
+			print theme('settlement_reciept', $payment, $payments, $customer);
+		} else {
+			print "No payment was found for customer.";
+		}
+	} else {
+		print "Access denied to reciept.";
+	}
+}
+
 function pos_api_expose_manager_override() {
 	$failed_response = array(
 		'status' => false,
