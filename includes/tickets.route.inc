@@ -1108,6 +1108,11 @@ function pos_api_expose_credit_cash_checkout() {
 			$cuid = $request->customer;
 
 			$cash_value = $request->cash_val;
+			if($change > 0 && $change < .01) {
+				$change = 0;
+				$cash = bcadd($change, $cash, 6);
+				$cash_value = bcadd($change, $cash_value, 6);
+			}
 
 			$check = $request->check;
 			$check_val = $request->check_val;
@@ -1124,7 +1129,7 @@ function pos_api_expose_credit_cash_checkout() {
 			$transac_id = $request->transac_id;
 			$register_id = $request->register_id;
 
-			$settlement_amount = ((double)$cash)-((double)$change);
+			$settlement_amount = bcsub($cash, $change, 6);
 
 			$time = time();
 
@@ -1148,7 +1153,7 @@ function pos_api_expose_credit_cash_checkout() {
 					if($usage->credit_amount > 0) {
 						if($settlement_amount <= 0) {
 							break;
-						} else if($settlement_amount > 0 && $settlement_amount < $usage->credit_amount && number_format($usage->credit_amount-$settlement_amount, 2) != 0) {
+						} else if($settlement_amount > 0 && bccomp($settlement_amount, $usage->credit_amount, 2) == -1) {
 							if($breakdown_set) {
 								$remarks = '';
 							} else {
@@ -1183,7 +1188,7 @@ function pos_api_expose_credit_cash_checkout() {
 								(cuid, settlement_amount, payment_type, remarks, settlement_date, euid, register_id)
 								VALUES ('%d', '%s', '%s', '%s', '%s', '%d', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', $remarks, $time, $uid, $register_id);
 							db_query("UPDATE {user_term_credits_usages} SET settled = '1' WHERE cuid = '%d'", $usage->cuid);
-							$settlement_amount = $settlement_amount-$usage->credit_amount;
+							$settlement_amount = bcsub($settlement_amount, $usage->credit_amount, 6);
 							if(!empty($remarks)) {
 								$sid = db_last_insert_id('user_term_credits_settlements', 'sid');
 								db_query("INSERT INTO {user_term_credits_cash_log} (sid, amount_paid, `change`, total) VALUES ('%d', '%s', '%s', '%s')", $sid, $cash_value, $change, $cash);

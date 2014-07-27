@@ -77,9 +77,9 @@ if($uid) {
       $header = array('#', 'Payment Date', 'Payment', 'Invoice #', 'Invoiced Amount', 'Settlement', 'Remaining Balance', 'Days');
       $rows = array();
       foreach($breakdown as $line_item) {
-      	if($line_item->settlement_amount > 0 && $line_item->settlement_amount < .01) {
+      	/*if($line_item->settlement_amount > 0 && $line_item->settlement_amount < .01) {
       		$line_item->settlement_amount = .01;
-      	}
+      	}*/
 
       	$rows[] = array($line_item->sid, date("n/j/Y", $payment->settlement_date), uc_currency_format($payment->paid, false), $line_item->order_id, uc_currency_format($line_item->credit_amount, false), uc_currency_format($line_item->settlement_amount, false), uc_currency_format($line_item->balance, false), (int)($line_item->days/86400));
       }
