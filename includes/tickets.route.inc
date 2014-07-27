@@ -1158,6 +1158,19 @@ function pos_api_expose_credit_cash_checkout() {
 							db_query("INSERT INTO {user_term_credits_settlements}
 								(cuid, settlement_amount, payment_type, remarks, settlement_date, euid, register_id)
 								VALUES ('%d', '%s', '%s', '%s', '%s', '%d', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', $remarks, $time, $uid, $register_id);
+							if(!empty($remarks)) {
+								$sid = db_last_insert_id('user_term_credits_settlements', 'sid');
+								db_query("INSERT INTO {user_term_credits_cash_log} (sid, amount_paid, `change`, total) VALUES ('%d', '%s', '%s', '%s')", $sid, $cash_value, $change, $cash);
+								if($check) {
+									db_query("INSERT INTO {user_term_credits_check_log} (sid, paid_amount, check_number, post_dated, cash_date) VALUES ('%d', '%s', '%s', '%d', '%s')", $sid, $check_val, $check_number, $post_dated, $check_date);
+								}
+								if($credit) {
+									db_query("INSERT INTO {user_term_credits_credit_card_log} (sid, amount_paid, transaction_id) VALUES ('%d', '%s', '%s')", $sid, $credit_val, $transac_id);
+								}
+								if($mo) {
+									db_query("INSERT INTO {user_term_credits_money_order_log} (sid, paid_amount, reference) VALUES ('%d', '%s', '%s')", $sid, $mo_val, $mo_ref);
+								}
+							}
 							break;
 						} else {
 							if($breakdown_set) {
@@ -1171,6 +1184,19 @@ function pos_api_expose_credit_cash_checkout() {
 								VALUES ('%d', '%s', '%s', '%s', '%s', '%d', '%s')", $usage->cuid, $usage->credit_amount, 'pos_payment', $remarks, $time, $uid, $register_id);
 							db_query("UPDATE {user_term_credits_usages} SET settled = '1' WHERE cuid = '%d'", $usage->cuid);
 							$settlement_amount = $settlement_amount-$usage->credit_amount;
+							if(!empty($remarks)) {
+								$sid = db_last_insert_id('user_term_credits_settlements', 'sid');
+								db_query("INSERT INTO {user_term_credits_cash_log} (sid, amount_paid, `change`, total) VALUES ('%d', '%s', '%s', '%s')", $sid, $cash_value, $change, $cash);
+								if($check) {
+									db_query("INSERT INTO {user_term_credits_check_log} (sid, paid_amount, check_number, post_dated, cash_date) VALUES ('%d', '%s', '%s', '%d', '%s')", $sid, $check_val, $check_number, $post_dated, $check_date);
+								}
+								if($credit) {
+									db_query("INSERT INTO {user_term_credits_credit_card_log} (sid, amount_paid, transaction_id) VALUES ('%d', '%s', '%s')", $sid, $credit_val, $transac_id);
+								}
+								if($mo) {
+									db_query("INSERT INTO {user_term_credits_money_order_log} (sid, paid_amount, reference) VALUES ('%d', '%s', '%s')", $sid, $mo_val, $mo_ref);
+								}
+							}
 						}
 					}
 				}
