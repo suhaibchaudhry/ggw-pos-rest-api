@@ -1108,7 +1108,8 @@ function pos_api_expose_credit_cash_checkout() {
 			$cuid = $request->customer;
 
 			$cash_value = $request->cash_val;
-			if($change > 0 && $change < .01) {
+
+			if($change > 0 && bccomp($change, '0.005', 3) == -1) {
 				$change = 0;
 				$cash = bcadd($change, $cash, 6);
 				$cash_value = bcadd($change, $cash_value, 6);
