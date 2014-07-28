@@ -81,7 +81,7 @@ if($uid) {
       		$line_item->settlement_amount = .01;
       	}*/
 
-      	$rows[] = array($line_item->sid, date("n/j/Y", $payment->settlement_date), uc_currency_format($payment->paid, false), $line_item->order_id, uc_currency_format($line_item->credit_amount, false), uc_currency_format($line_item->settlement_amount, false), uc_currency_format($line_item->balance, false), (int)($line_item->days/86400));
+      	$rows[] = array($line_item->sid, date("n/j/Y", $payment->settlement_date), user_term_credits_recursive_round($payment->paid), $line_item->order_id, uc_currency_format($line_item->credit_amount, false), uc_currency_format($line_item->settlement_amount, false), uc_currency_format($line_item->balance, false), (int)($line_item->days/86400));
       }
 
       print theme('table', $header, $rows);
@@ -107,12 +107,16 @@ if($uid) {
     	$rows[] = array('CHECK', uc_currency_format($payment_forms['CHECK'], false));
     }
 
+    if($payment_forms['PCHECK'] > 0) {
+      $rows[] = array('POST DATED CHECK', uc_currency_format($payment_forms['PCHECK'], false));
+    }
+
     if($payment_forms['MO'] > 0) {
-    	$rows[] = array('MO', uc_currency_format($payment_forms['MO'], false));
+    	$rows[] = array('MONEY ORDER', uc_currency_format($payment_forms['MO'], false));
     }
 
     if($payment_forms['CC'] > 0) {
-    	$rows[] = array('CC', uc_currency_format($payment_forms['CC'], false));
+    	$rows[] = array('CREDIT CARD', uc_currency_format($payment_forms['CC'], false));
     }
 
     print theme('table', array(), $rows);
