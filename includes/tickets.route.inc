@@ -932,6 +932,9 @@ function pos_api_expose_ticket_partial_checkout() {
 				$mo_val = $request->mo_val;
 				$mo_ref = $request->mo_ref;
 
+				$rma = $request->rma_credit_used;
+				$rma_credit = $request->rma_credit;
+
 				//$credit = $request->credit;
 				//$credit_val = $request->credit_val;
 				//$transac_id = $request->transac_id;
@@ -979,9 +982,16 @@ function pos_api_expose_ticket_partial_checkout() {
 							$mo_pid = db_last_insert_id('pos_api_expose_money_order_log', 'pid');
 						}
 
-						$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`)
-							VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s')";
-						db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time());
+						$rma_pid = 0;
+						if($rma) {
+							$sql = "INSERT INTO {pos_api_expose_rma_refund_log} (uid, cuid, total_refund, `timestamp`) VALUES ('%d', '%d', '-%s', '%s')";
+							db_query($sql, $uid, $cuid, $rma_credit, time());
+							$rma_pid = db_last_insert_id('pos_api_expose_rma_refund_log', 'pid');
+						}
+
+						$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`, rma_pid)
+							VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%d')";
+						db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time(), $rma_pid);
 
 						_pos_api_expose_stock_adjustment($ticketId);
 
@@ -1044,6 +1054,9 @@ function pos_api_expose_ticket_cash_checkout() {
 		$mo_val = $request->mo_val;
 		$mo_ref = $request->mo_ref;
 
+		$rma = $request->rma_credit_used;
+		$rma_credit = $request->rma_credit;
+
 		$credit = $request->credit;
 		$credit_val = $request->credit_val;
 		$transac_id = $request->transac_id;
@@ -1077,9 +1090,16 @@ function pos_api_expose_ticket_cash_checkout() {
 				$credit_pid = db_last_insert_id('pos_api_expose_credit_card_log', 'pid');
 			}
 
-			$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`)
-				VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s')";
-			db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time());
+			$rma_pid = 0;
+			if($rma) {
+				$sql = "INSERT INTO {pos_api_expose_rma_refund_log} (uid, cuid, total_refund, `timestamp`) VALUES ('%d', '%d', '-%s', '%s')";
+				db_query($sql, $uid, $cuid, $rma_credit, time());
+				$rma_pid = db_last_insert_id('pos_api_expose_rma_refund_log', 'pid');
+			}
+
+			$sql = "INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`, rma_pid)
+				VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%d')";
+			db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time(), $rma_pid);
 
 			_pos_api_expose_stock_adjustment($ticketId);
 

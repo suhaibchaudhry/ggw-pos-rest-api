@@ -163,7 +163,8 @@ function pos_api_expose_credit_summary() {
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			$user = user_load($customer_uid);
-			pos_api_expose_respond(array('status' => true, 'credit_limits' => $user->credit_limits), true);
+			$rma_credits = db_result(db_query("SELECT IFNULL(SUM(total_refund),0) FROM {pos_api_expose_rma_refund_log} WHERE cuid = '%d' AND credit_usage_id = '0'", $customer_uid));
+			pos_api_expose_respond(array('status' => true, 'credit_limits' => $user->credit_limits, 'rma_credits' => $rma_credits), true);
 		}
 	}
 
