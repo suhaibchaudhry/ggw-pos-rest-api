@@ -355,6 +355,16 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   	);
 
+    $routers['pos-api/ticket/open/%'] = array(
+      'title' => 'Get List of Open Tickets',
+      'description' => 'Get AHAH quote ticket list.',
+      'page callback' => 'pos_api_expose_open_invoices',
+      'page arguments' => array(3),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'file' => 'includes/tickets.route.inc'
+    );
+
   	$routers['pos-api/ticket/closed'] = array(
   		'title' => 'Get List of closed Tickets',
   		'description' => 'Get AHAH closed ticket list.',
