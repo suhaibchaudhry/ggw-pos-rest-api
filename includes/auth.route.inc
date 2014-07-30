@@ -67,18 +67,20 @@ function pos_api_expose_auth() {
 
 			$response['privileged'] = (bool)$privileged;
 			$response['admin'] = (bool)$admin;
-			if(property_exists($last_ticket, 'ticket_id')) {
-				$last_ticket->ticket_id = (int)$last_ticket->ticket_id;
-			}
-			if(property_exists($last_ticket, 'uid')) {
-				$last_ticket->uid = (int)$last_ticket->uid;
-			}
-			if(property_exists($last_ticket, 'product_count')) {
-				$last_ticket->product_count = (int)$last_ticket->product_count;
-			}
-			if($last_ticket->uid == 0 && $last_ticket->product_count == 0 && $last_ticket->order_status == 'pos_quote') {
-				$time = time();
-				db_query("UPDATE uc_orders SET `created` = '%s', `modified` = '%s' WHERE order_id = '%d'", $time, $time, $last_ticket->ticket_id);
+			if($last_ticket) {
+				if(property_exists($last_ticket, 'ticket_id')) {
+					$last_ticket->ticket_id = (int)$last_ticket->ticket_id;
+				}
+				if(property_exists($last_ticket, 'uid')) {
+					$last_ticket->uid = (int)$last_ticket->uid;
+				}
+				if(property_exists($last_ticket, 'product_count')) {
+					$last_ticket->product_count = (int)$last_ticket->product_count;
+				}
+				if($last_ticket->uid == 0 && $last_ticket->product_count == 0 && $last_ticket->order_status == 'pos_quote') {
+					$time = time();
+					db_query("UPDATE uc_orders SET `created` = '%s', `modified` = '%s' WHERE order_id = '%d'", $time, $time, $last_ticket->ticket_id);
+				}
 			}
 			$response['last_ticket'] = $last_ticket;
 
