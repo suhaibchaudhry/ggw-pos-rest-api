@@ -17,398 +17,398 @@ function pos_api_expose_menu() {
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/auth.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/clock'] = array(
-  		'title' => 'Clock RPC',
-  		'description' => 'Clock in or clock out callback for POS Users.',
+  $routers['pos-api/clock'] = array(
+  	'title' => 'Clock RPC',
+  	'description' => 'Clock in or clock out callback for POS Users.',
 		'page callback' => 'pos_api_expose_clock',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/clock.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/clockState'] = array(
-  		'title' => 'Clock State RPC',
-  		'description' => 'Query clock state for initial button states on app.',
+  $routers['pos-api/clockState'] = array(
+  	'title' => 'Clock State RPC',
+  	'description' => 'Query clock state for initial button states on app.',
 		'page callback' => 'pos_api_expose_clockState',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/clock.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/product-scan'] = array(
-  		'title' => 'Scan Product Barcode',
-  		'description' => 'Search for products by a barcode.',
+  $routers['pos-api/product-scan'] = array(
+  	'title' => 'Scan Product Barcode',
+  	'description' => 'Search for products by a barcode.',
 		'page callback' => 'pos_api_expose_product_scan',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/products.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/ticket-statuses'] = array(
-  		'title' => 'Ticket Statuses.',
-  		'description' => 'Get a list of ticket status.',
+  $routers['pos-api/ticket-statuses'] = array(
+  	'title' => 'Ticket Statuses.',
+  	'description' => 'Get a list of ticket status.',
 		'page callback' => 'pos_api_expose_ticket_statuses',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/tickets.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/new-ticket'] = array(
-  		'title' => 'New Ticket',
-  		'description' => 'Create a new ticket and get ticketId.',
+  $routers['pos-api/new-ticket'] = array(
+  	'title' => 'New Ticket',
+  	'description' => 'Create a new ticket and get ticketId.',
 		'page callback' => 'pos_api_expose_new_ticket',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/tickets.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/load-ticket'] = array(
-  		'title' => 'Load Ticket Products',
-  		'description' => 'Load products from an existing ticketId.',
+  $routers['pos-api/load-ticket'] = array(
+  	'title' => 'Load Ticket Products',
+  	'description' => 'Load products from an existing ticketId.',
 		'page callback' => 'pos_api_expose_load_ticket_products',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/products.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/ticket/update-customer'] = array(
-  		'title' => 'Update Ticket Customer',
-  		'description' => 'Update customer on a ticket.',
+  $routers['pos-api/ticket/update-customer'] = array(
+  	'title' => 'Update Ticket Customer',
+  	'description' => 'Update customer on a ticket.',
 		'page callback' => 'pos_api_expose_ticket_update_customer',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/tickets.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/ticket/update-qty'] = array(
-  		'title' => 'Update Ticket Qty',
-  		'description' => 'Update customer on a qty.',
+  $routers['pos-api/ticket/update-qty'] = array(
+  	'title' => 'Update Ticket Qty',
+  	'description' => 'Update customer on a qty.',
 		'page callback' => 'pos_api_expose_ticket_update_product_qty',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/tickets.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/ticket/get-current'] = array(
-  		'title' => 'Update Ticket Customer',
-  		'description' => 'Get current ticket to patch dirty caches on typeaheadjs.',
+  $routers['pos-api/ticket/get-current'] = array(
+  	'title' => 'Update Ticket Customer',
+  	'description' => 'Get current ticket to patch dirty caches on typeaheadjs.',
 		'page callback' => 'pos_api_expose_ticket_current',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/tickets.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/ticket/add-product'] = array(
-  		'title' => 'Add Product to Ticket',
-  		'description' => 'Add a product to ticket.',
+  $routers['pos-api/ticket/add-product'] = array(
+  	'title' => 'Add Product to Ticket',
+  	'description' => 'Add a product to ticket.',
 		'page callback' => 'pos_api_expose_ticket_add_product',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/tickets.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/ticket/remove-product'] = array(
-  		'title' => 'Remove Product from Ticket',
-  		'description' => 'Remove a product from ticket.',
+  $routers['pos-api/ticket/remove-product'] = array(
+  	'title' => 'Remove Product from Ticket',
+  	'description' => 'Remove a product from ticket.',
 		'page callback' => 'pos_api_expose_ticket_remove_product',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/tickets.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/ticket/update-total'] = array(
-  		'title' => 'Update Ticket Totals',
-  		'description' => 'Update a ticket totals.',
-		  'page callback' => 'pos_api_expose_ticket_update_totals',
-		  'access arguments' => array('access content'),
-		  'type' => MENU_CALLBACK,
-		  'file' => 'includes/tickets.route.inc'
-  	);
-
-    $routers['pos-api/ticket/reprocess-rma'] = array(
-      'title' => 'Update RMA Refunds',
-      'description' => 'Update a refund amount on an rma ticket.',
-      'page callback' => 'pos_api_expose_update_rma_refund',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-    $routers['pos-api/ticket/process-rma'] = array(
-      'title' => 'Process an RMA ticket.',
-      'description' => 'Update a refund amount on an rma ticket.',
-      'page callback' => 'pos_api_expose_process_rma',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-  	$routers['pos-api/ticket/update-status'] = array(
-  		'title' => 'Update Ticket Status',
-  		'description' => 'Update a ticket status.',
-		'page callback' => 'pos_api_expose_ticket_update_status',
+  $routers['pos-api/ticket/update-total'] = array(
+  	'title' => 'Update Ticket Totals',
+  	'description' => 'Update a ticket totals.',
+		'page callback' => 'pos_api_expose_ticket_update_totals',
 		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/tickets.route.inc'
-  	);
+  );
 
-  	$routers['pos-api/ticket/delivery'] = array(
-  		'title' => 'Ticket Delivey',
-  		'description' => 'Update ticket delivery.',
-  		'page callback' => 'pos_api_expose_ticket_update_zone',
-  		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
-  	);
+  $routers['pos-api/ticket/reprocess-rma'] = array(
+    'title' => 'Update RMA Refunds',
+    'description' => 'Update a refund amount on an rma ticket.',
+    'page callback' => 'pos_api_expose_update_rma_refund',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
 
-  	$routers['pos-api/ticket/cash-checkout'] = array(
-  		'title' => 'Cash Checkout',
-  		'description' => 'Checkout with cash.',
-  		'page callback' => 'pos_api_expose_ticket_cash_checkout',
-  		'access arguments' => array('access content'),
-		  'type' => MENU_CALLBACK,
-		  'file' => 'includes/tickets.route.inc'
-  	);
+  $routers['pos-api/ticket/process-rma'] = array(
+    'title' => 'Process an RMA ticket.',
+    'description' => 'Update a refund amount on an rma ticket.',
+    'page callback' => 'pos_api_expose_process_rma',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
 
-  	$routers['pos-api/ticket/credit-checkout'] = array(
-  		'title' => 'Customer Credits Checkout',
-  		'description' => 'Checkout customer using credit.',
-  		'page callback' => 'pos_api_expose_credit_checkout',
-  		'access arguments' => array('access content'),
-		  'type' => MENU_CALLBACK,
-		  'file' => 'includes/tickets.route.inc'
-  	);
+	$routers['pos-api/ticket/update-status'] = array(
+		'title' => 'Update Ticket Status',
+		'description' => 'Update a ticket status.',
+	  'page callback' => 'pos_api_expose_ticket_update_status',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
 
-    $routers['pos-api/ticket/swipe-checkout'] = array(
-      'title' => 'Credit Card Swipe Checkout',
-      'description' => 'Checkout RPC for magnetic card swipe.',
-      'page callback' => 'pos_api_expose_ticket_swipe_checkout',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-    $routers['pos-api/ticket/partial-swipe-checkout'] = array(
-      'title' => 'Partial Credit Card Swipe Checkout',
-      'description' => 'Checkout RPC for magnetic card swipe with cash.',
-      'page callback' => 'pos_api_expose_ticket_partial_checkout',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-    $routers['pos-api/ticket/credit-cash-checkout'] = array(
-      'title' => 'Credit Cash Checkout',
-      'description' => 'Checkout credit payments with cash.',
-      'page callback' => 'pos_api_expose_credit_cash_checkout',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-    $routers['pos-api/ticket/rma-checkout'] = array(
-      'title' => 'Customer RMA Checkout',
-      'description' => 'Checkout customer RMA ticket.',
-      'page callback' => 'pos_api_expose_rma_refund',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-    $routers['pos-api/ticket/create-rma-ticket'] = array(
-      'title' => 'Create RMA Ticket',
-      'description' => 'Checkout customer RMA ticket.',
-      'page callback' => 'pos_api_expose_rma_create_ticket',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-    $routers['pos-api/ticket/rma-products'] = array(
-      'title' => 'Customer RMA Products',
-      'description' => 'Products of customer RMA ticket.',
-      'page callback' => 'pos_api_expose_rma_products',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/products.route.inc'
-    );
-
-    $routers['pos-api/ticket/load-total'] = array(
-      'title' => 'Ticket Total',
-      'description' => 'Get the complete total on a ticket from server before checkout.',
-      'page callback' => 'pos_api_expose_ticket_totals',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-  	$routers['pos-api/tickets/%/%'] = array(
-  		'title' => 'Search Tickets',
-  		'description' => 'Search for tickets by ticket id or customer info.',
-		'page callback' => 'pos_api_expose_ticket_search',
+	$routers['pos-api/ticket/delivery'] = array(
+		'title' => 'Ticket Delivey',
+		'description' => 'Update ticket delivery.',
+		'page callback' => 'pos_api_expose_ticket_update_zone',
 		'access arguments' => array('access content'),
-		'page arguments' => array(2, 3),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
-  	);
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
 
-  	$routers['pos-api/products/%/%'] = array(
-  		'title' => 'Search Products',
-  		'description' => 'Search for products by name or sku.',
-		'page callback' => 'pos_api_expose_product_search',
+	$routers['pos-api/ticket/cash-checkout'] = array(
+		'title' => 'Cash Checkout',
+		'description' => 'Checkout with cash.',
+		'page callback' => 'pos_api_expose_ticket_cash_checkout',
 		'access arguments' => array('access content'),
-		'page arguments' => array(2, 3),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
+
+	$routers['pos-api/ticket/credit-checkout'] = array(
+		'title' => 'Customer Credits Checkout',
+		'description' => 'Checkout customer using credit.',
+		'page callback' => 'pos_api_expose_credit_checkout',
+		'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
+
+  $routers['pos-api/ticket/swipe-checkout'] = array(
+    'title' => 'Credit Card Swipe Checkout',
+    'description' => 'Checkout RPC for magnetic card swipe.',
+    'page callback' => 'pos_api_expose_ticket_swipe_checkout',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
+
+  $routers['pos-api/ticket/partial-swipe-checkout'] = array(
+    'title' => 'Partial Credit Card Swipe Checkout',
+    'description' => 'Checkout RPC for magnetic card swipe with cash.',
+    'page callback' => 'pos_api_expose_ticket_partial_checkout',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
+
+  $routers['pos-api/ticket/credit-cash-checkout'] = array(
+    'title' => 'Credit Cash Checkout',
+    'description' => 'Checkout credit payments with cash.',
+    'page callback' => 'pos_api_expose_credit_cash_checkout',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
+
+  $routers['pos-api/ticket/rma-checkout'] = array(
+    'title' => 'Customer RMA Checkout',
+    'description' => 'Checkout customer RMA ticket.',
+    'page callback' => 'pos_api_expose_rma_refund',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
+
+  $routers['pos-api/ticket/create-rma-ticket'] = array(
+    'title' => 'Create RMA Ticket',
+    'description' => 'Checkout customer RMA ticket.',
+    'page callback' => 'pos_api_expose_rma_create_ticket',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
+
+  $routers['pos-api/ticket/rma-products'] = array(
+    'title' => 'Customer RMA Products',
+    'description' => 'Products of customer RMA ticket.',
+    'page callback' => 'pos_api_expose_rma_products',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/products.route.inc'
+  );
+
+  $routers['pos-api/ticket/load-total'] = array(
+    'title' => 'Ticket Total',
+    'description' => 'Get the complete total on a ticket from server before checkout.',
+    'page callback' => 'pos_api_expose_ticket_totals',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
+
+	$routers['pos-api/tickets/%/%'] = array(
+		'title' => 'Search Tickets',
+		'description' => 'Search for tickets by ticket id or customer info.',
+	  'page callback' => 'pos_api_expose_ticket_search',
+	  'access arguments' => array('access content'),
+	  'page arguments' => array(2, 3),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
+
+	$routers['pos-api/products/%/%'] = array(
+		'title' => 'Search Products',
+		'description' => 'Search for products by name or sku.',
+	  'page callback' => 'pos_api_expose_product_search',
+	  'access arguments' => array('access content'),
+	  'page arguments' => array(2, 3),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/products.route.inc'
+	);
+
+	$routers['pos-api/customers/%/%'] = array(
+		'title' => 'Search Customers',
+		'description' => 'Search for customer by company name, number, address or other field keywords.',
+	  'page callback' => 'pos_api_expose_customer_search',
+	  'access arguments' => array('access content'),
+	  'page arguments' => array(2, 3),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/customers.route.inc'
+	);
+
+	$routers['pos-api/customer'] = array(
+		'title' => 'Search Customers',
+		'description' => 'Search for customer by customer uid, number, address or other field keywords.',
+	  'page callback' => 'pos_api_expose_get_customer',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/customers.route.inc'
+	);
+
+	$routers['pos-api/customer/info'] = array(
+		'title' => 'Customer Info',
+		'description' => 'Get customer info.',
+	  'page callback' => 'pos_api_expose_customer_info',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/customers.route.inc'
+	);
+
+  $routers['pos-api/customer/info-payments'] = array(
+    'title' => 'Customer Info',
+    'description' => 'Get customer info payments.',
+    'page callback' => 'pos_api_expose_customer_info_payments',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/customers.route.inc'
+  );
+
+  $routers['pos-api/customer/settlement-list'] = array(
+    'title' => 'Customer Settlement Info',
+    'description' => 'Get customer info payments.',
+    'page callback' => 'pos_api_expose_customer_info_settlements',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/customers.route.inc'
+  );
+
+	$routers['pos-api/customer/credits'] = array(
+		'title' => 'Customer Credits',
+		'description' => 'Get customers credit summary object.',
+		'page callback' => 'pos_api_expose_credit_summary',
+		'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/customers.route.inc'
+	);
+
+	$routers['pos-api/customer/invoice'] = array(
+		'title' => 'Customer Invoices',
+		'description' => 'Get AHAH customer invoice list.',
+  	'page callback' => 'pos_api_expose_customer_invoices',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/customers.route.inc'
+	);
+
+	$routers['pos-api/employee/recent-tickets'] = array(
+		'title' => 'Get Recent Tickets',
+		'description' => 'Get AHAH recent ticket list.',
+	  'page callback' => 'pos_api_expose_recent_invoices',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
+
+	$routers['pos-api/ticket/quote'] = array(
+		'title' => 'Get List of Quote Tickets',
+		'description' => 'Get AHAH quote ticket list.',
+	  'page callback' => 'pos_api_expose_quote_invoices',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
+
+	$routers['pos-api/ticket/open'] = array(
+		'title' => 'Get List of Open Tickets',
+		'description' => 'Get AHAH quote ticket list.',
+	  'page callback' => 'pos_api_expose_open_invoices',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
+
+  $routers['pos-api/ticket/open/%'] = array(
+    'title' => 'Get List of Open Tickets',
+    'description' => 'Get AHAH quote ticket list.',
+    'page callback' => 'pos_api_expose_open_invoices',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
+
+	$routers['pos-api/ticket/closed'] = array(
+		'title' => 'Get List of closed Tickets',
+		'description' => 'Get AHAH closed ticket list.',
+	  'page callback' => 'pos_api_expose_closed_invoices',
+	  'access arguments' => array('access content'),
+	  'type' => MENU_CALLBACK,
+	  'file' => 'includes/tickets.route.inc'
+	);
+
+	$routers['pos-api/ticket/rma'] = array(
+		'title' => 'RMA Process RPC Handler',
+		'description' => 'Get confirmation when object is scanned.',
+		'page callback' => 'pos_api_rma_process',
+		'access arguments' => array('access content'),
 		'type' => MENU_CALLBACK,
 		'file' => 'includes/products.route.inc'
-  	);
+	);
 
-  	$routers['pos-api/customers/%/%'] = array(
-  		'title' => 'Search Customers',
-  		'description' => 'Search for customer by company name, number, address or other field keywords.',
-		'page callback' => 'pos_api_expose_customer_search',
-		'access arguments' => array('access content'),
-		'page arguments' => array(2, 3),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/customers.route.inc'
-  	);
+  $routers['pos-api/ticket/product/manager-override'] = array(
+    'title' => 'Manager Price Override',
+    'description' => 'Manager price override rpc handler.',
+    'page callback' => 'pos_api_expose_manager_override',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
 
-  	$routers['pos-api/customer'] = array(
-  		'title' => 'Search Customers',
-  		'description' => 'Search for customer by customer uid, number, address or other field keywords.',
-		'page callback' => 'pos_api_expose_get_customer',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/customers.route.inc'
-  	);
+  $routers['admin/invoice/print/%'] = array(
+    'title' => 'Printable invoice',
+    'page arguments' => array(3),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'pos_ticket_invoice',
+    'file' => 'includes/tickets.route.inc'
+  );
 
-  	$routers['pos-api/customer/info'] = array(
-  		'title' => 'Customer Info',
-  		'description' => 'Get customer info.',
-		  'page callback' => 'pos_api_expose_customer_info',
-		  'access arguments' => array('access content'),
-		  'type' => MENU_CALLBACK,
-		  'file' => 'includes/customers.route.inc'
-  	);
-
-    $routers['pos-api/customer/info-payments'] = array(
-      'title' => 'Customer Info',
-      'description' => 'Get customer info payments.',
-      'page callback' => 'pos_api_expose_customer_info_payments',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/customers.route.inc'
-    );
-
-    $routers['pos-api/customer/settlement-list'] = array(
-      'title' => 'Customer Settlement Info',
-      'description' => 'Get customer info payments.',
-      'page callback' => 'pos_api_expose_customer_info_settlements',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/customers.route.inc'
-    );
-
-  	$routers['pos-api/customer/credits'] = array(
-  		'title' => 'Customer Credits',
-  		'description' => 'Get customers credit summary object.',
-  		'page callback' => 'pos_api_expose_credit_summary',
-  		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/customers.route.inc'
-  	);
-
-  	$routers['pos-api/customer/invoice'] = array(
-  		'title' => 'Customer Invoices',
-  		'description' => 'Get AHAH customer invoice list.',
-		'page callback' => 'pos_api_expose_customer_invoices',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/customers.route.inc'
-  	);
-
-  	$routers['pos-api/employee/recent-tickets'] = array(
-  		'title' => 'Get Recent Tickets',
-  		'description' => 'Get AHAH recent ticket list.',
-		'page callback' => 'pos_api_expose_recent_invoices',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
-  	);
-
-  	$routers['pos-api/ticket/quote'] = array(
-  		'title' => 'Get List of Quote Tickets',
-  		'description' => 'Get AHAH quote ticket list.',
-		'page callback' => 'pos_api_expose_quote_invoices',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
-  	);
-
-  	$routers['pos-api/ticket/open'] = array(
-  		'title' => 'Get List of Open Tickets',
-  		'description' => 'Get AHAH quote ticket list.',
-		'page callback' => 'pos_api_expose_open_invoices',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
-  	);
-
-    $routers['pos-api/ticket/open/%'] = array(
-      'title' => 'Get List of Open Tickets',
-      'description' => 'Get AHAH quote ticket list.',
-      'page callback' => 'pos_api_expose_open_invoices',
-      'page arguments' => array(3),
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-  	$routers['pos-api/ticket/closed'] = array(
-  		'title' => 'Get List of closed Tickets',
-  		'description' => 'Get AHAH closed ticket list.',
-		'page callback' => 'pos_api_expose_closed_invoices',
-		'access arguments' => array('access content'),
-		'type' => MENU_CALLBACK,
-		'file' => 'includes/tickets.route.inc'
-  	);
-
-  	$routers['pos-api/ticket/rma'] = array(
-  		'title' => 'RMA Process RPC Handler',
-  		'description' => 'Get confirmation when object is scanned.',
-  		'page callback' => 'pos_api_rma_process',
-  		'access arguments' => array('access content'),
-  		'type' => MENU_CALLBACK,
-  		'file' => 'includes/products.route.inc'
-  	);
-
-    $routers['pos-api/ticket/product/manager-override'] = array(
-      'title' => 'Manager Price Override',
-      'description' => 'Manager price override rpc handler.',
-      'page callback' => 'pos_api_expose_manager_override',
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'file' => 'includes/tickets.route.inc'
-    );
-
-    $routers['admin/invoice/print/%'] = array(
-      'title' => 'Printable invoice',
-      'page arguments' => array(3),
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'page callback' => 'pos_ticket_invoice',
-      'file' => 'includes/tickets.route.inc'
-    );
-
-    $routers['admin/invoice/print-reciept/%/%'] = array(
-      'title' => 'Printable invoice',
-      'page arguments' => array(3, 4),
-      'access arguments' => array('access content'),
-      'type' => MENU_CALLBACK,
-      'page callback' => 'pos_settlement_reciept',
-      'file' => 'includes/tickets.route.inc'
-    );
+  $routers['admin/invoice/print-reciept/%/%'] = array(
+    'title' => 'Printable invoice',
+    'page arguments' => array(3, 4),
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'pos_settlement_reciept',
+    'file' => 'includes/tickets.route.inc'
+  );
 
 	return $routers;
 }
