@@ -816,7 +816,15 @@ function pos_api_expose_ticket_update_zone() {
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
-			db_query("UPDATE {uc_orders} SET data = '%s' WHERE order_id = '%d'", serialize(array('zone' => 1)), $ticketId);
+			$zone = db_result(db_query("SELECT billing_zone FROM uc_orders WHERE order_id = '%d'", $ticketId));
+
+			if($zone) {
+				$zone = 0;
+			} else {
+				$zone = 1;
+			}
+
+			db_query("UPDATE {uc_orders} SET billing_zone = '%d' WHERE order_id = '%d'", $zone, $ticketId);
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'Ticket delivery zone updated.'), true);
 		}

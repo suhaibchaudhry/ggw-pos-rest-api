@@ -296,13 +296,14 @@ function pos_api_expose_load_ticket_products() {
         		LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
         		WHERE order_id = '%d'";
 
-    		        $items = db_query($sql, $ticketId);
+    		$items = db_query($sql, $ticketId);
 			$dataset = array();
+			$zone = db_result(db_query("SELECT billing_zone FROM uc_orders WHERE order_id = '%d'", $ticketId));
 			while($item = db_fetch_object($items)) {
 				$dataset[] = _pos_api_expose_map_product_datum($item, true, $ticketId);
 			}	
 
-			pos_api_expose_respond(array('status' => true, 'products' => $dataset), true);
+			pos_api_expose_respond(array('status' => true, 'zone' => $zone, 'products' => $dataset), true);
 		}
 	}
 
