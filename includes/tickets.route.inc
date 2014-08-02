@@ -688,6 +688,7 @@ function pos_api_expose_process_rma() {
 		$ticketId = $request->ticketId;
 		$customer_uid = $request->customer_uid;
 		$register_id = $request->register_id;
+		$credit_return = $request->credit_return;
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
@@ -740,15 +741,21 @@ function pos_api_expose_process_rma() {
 				//$credit_usage_id = $rma_pid = db_last_insert_id('user_term_credits_usages', 'cuid');
 				
 				//Credit usage id will be used as rma used flag.
-				db_query("INSERT INTO {pos_api_expose_rma_refund_log} (uid, cuid, credit_usage_id, total_refund, rma_ticket_id, `timestamp`)
+				if($credit_return) {
+					db_query("INSERT INTO {pos_api_expose_rma_refund_log} (uid, cuid, credit_usage_id, total_refund, rma_ticket_id, `timestamp`)
 					VALUES ('%d', '%d', '%d', '%s', '%d', '%s')", $uid, $customer_uid, 0, $amount_returned, $ticketId, time());
 				
-				$rma_pid = db_last_insert_id('pos_api_expose_rma_refund_log', 'pid');
+					$rma_pid = db_last_insert_id('pos_api_expose_rma_refund_log', 'pid');
+					$message = 'RMA Credit was processed in the amount of $'.number_format($amount_returned, 2);
+				} else {
+					$rma_pid = -1;
+					$message = 'RMA CASH was processed, please provide customer with $'.number_format($amount_returned, 2);
+				}
 
 				db_query("INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, amount, rma_pid, register_id, `timestamp`) VALUES ('%d', '%d', '%s', '%d', '%s', '%s')", $uid, $customer_uid, $amount_returned, $rma_pid, $register_id, time());
 
 				pos_api_expose_respond(array('status' => true,
-											 'message' => 'RMA ticket was processed in the amount of $'.number_format($amount_returned, 2)), true);
+											 'message' => $message), true);
 
 			}
 		}

@@ -588,7 +588,7 @@ function pos_api_expose_schema() {
 				'type' => 'int',
         		'not null' => TRUE,
         		'default' => 0,
-				'unsigned' => TRUE,
+				'unsigned' => FALSE,
 				'description' => "RMA pid"
 			),
 			'cc_pid' => array(
@@ -952,7 +952,7 @@ function pos_api_expose_schema() {
 				'type' => 'int',
         		'not null' => TRUE,
         		'default' => 0,
-				'unsigned' => TRUE,
+				'unsigned' => FALSE,
 				'description' => "RMA pid"
 			),
 			'cc_pid' => array(
@@ -1058,4 +1058,9 @@ function pos_api_expose_update_6017() {
 		$table = drupal_get_schema_unprocessed('pos_api_expose', $table_name);
 		db_create_table($res, $table_name, $table);
 	}
+}
+
+function pos_api_expose_update_6018() {
+	db_query("ALTER TABLE {pos_api_expose_transaction_log} MODIFY rma_pid int signed;");
+	db_query("ALTER TABLE {pos_api_expose_transaction_log_dp} MODIFY rma_pid int signed;");
 }
