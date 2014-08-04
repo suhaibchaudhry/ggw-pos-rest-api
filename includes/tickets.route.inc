@@ -435,23 +435,29 @@ function pos_api_expose_ticket_update_customer() {
 
 					while($role = db_fetch_object($rids)) {
 						$rid = $role->rid;
-						$nodes = db_query("SELECT uop.nid, upprp.price FROM {uc_order_products} uop 
+						$nodes = db_query("SELECT uop.order_product_id, upprp.price FROM {uc_order_products} uop 
 							INNER JOIN {uc_price_per_role_prices} upprp on uop.nid = upprp.nid
 							WHERE uop.order_id = '%d' AND upprp.rid = '%d'", $ticketId, $rid);
 						while($node = db_fetch_object($nodes)) {
 							if($node->price) {
-								db_query("UPDATE {uc_order_products} SET price = '%f' WHERE order_id = '%d' AND nid = '%d'", $node->price, $ticketId, $node->nid);
+								$count = db_result(db_query("SELECT COUNT(*) FROM pos_api_expose_manager_override_log WHERE product_nid = '%d'", $node->order_product_id));
+								if($count == 0) {
+									db_query("UPDATE {uc_order_products} SET price = '%s' WHERE order_id = '%d' AND order_product_id = '%d'", $node->price, $ticketId, $node->order_product_id);
+								}
 							}
 						}
 					}
 				} else {
 					//Reset to sell price
-					$nodes = db_query("SELECT uop.nid, up.sell_price FROM {uc_order_products} uop
+					$nodes = db_query("SELECT uop.order_product_id, up.sell_price FROM {uc_order_products} uop
 							 INNER JOIN {uc_products} up ON uop.nid = up.nid
 							 WHERE uop.order_id = '%d'", $ticketId);
 
 					while($node = db_fetch_object($nodes)) {
-						db_query("UPDATE {uc_order_products} SET price = '%f' WHERE order_id = '%d' AND nid = '%d'", $node->sell_price, $ticketId, $node->nid);
+						$count = db_result(db_query("SELECT COUNT(*) FROM pos_api_expose_manager_override_log WHERE product_nid = '%d'", $node->order_product_id));
+						if($count == 0) {
+							db_query("UPDATE {uc_order_products} SET price = '%s' WHERE order_id = '%d' AND order_product_id = '%d'", $node->sell_price, $ticketId, $node->order_product_id);
+						}
 					}
 				}
 			}
