@@ -582,12 +582,24 @@ function pos_api_expose_ticket_add_product() {
 		$uid = _pos_api_expose_uid_from_token($request->token);
 
 		if($uid) {
+			$cuid = $request->customerUid;
 			$order_product = new stdClass();
 			$order_product->order_id = $request->ticketId;
 			$order_product->nid = $request->productId;
 			$order_product->title = $request->name;
 			$order_product->model = $request->sku;
-			$order_product->price = $request->price;
+
+			if($cuid > 0) {
+				$price = _pos_api_get_customer_price($cuid, $order_product->nid);
+				if($price) {
+					$order_product->price = $price;
+				} else {
+					$order_product->price = $request->price;
+				}
+			} else {
+				$order_product->price = $request->price;
+			}
+
 
 			$order_product->cost = pos_stock_management_average_cost($order_product->nid);
 			if(empty($order_product->cost)) {
@@ -610,6 +622,12 @@ function pos_api_expose_ticket_add_product() {
 	}
 
 	pos_api_expose_respond($failed_response);
+}
+
+function _pos_api_get_customer_price($customer_uid, $nid) {
+	return db_result(db_query("SELECT up.price FROM users_roles ur
+	 INNER JOIN uc_price_per_role_prices up ON ur.rid = up.rid
+	 WHERE ur.uid = '%d' AND up.nid = '%d'", $customer_uid, $nid));
 }
 
 function pos_api_expose_ticket_remove_product() {
