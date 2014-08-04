@@ -1060,7 +1060,7 @@ function pos_api_expose_update_6017() {
 	}
 }
 
-function pos_api_expose_update_6018() {
-	db_query("ALTER TABLE {pos_api_expose_transaction_log} MODIFY rma_pid int signed;");
-	db_query("ALTER TABLE {pos_api_expose_transaction_log_dp} MODIFY rma_pid int signed;");
+function pos_api_expose_update_6019() {
+	db_query("ALTER TABLE {pos_api_expose_transaction_log} MODIFY rma_pid int signed NOT NULL DEFAULT 0;");
+	db_query("ALTER TABLE {pos_api_expose_transaction_log_dp} MODIFY rma_pid int signed NOT NULL DEFAULT 0;");
 }
