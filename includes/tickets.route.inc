@@ -428,7 +428,8 @@ function pos_api_expose_ticket_update_customer() {
 			if($ticketId) {
 				db_query("UPDATE {uc_orders} SET uid = '%d' WHERE order_id = '%d'", $customerUid, $ticketId);
 				pos_api_expose_ticket_update_total_on_server($ticketId);
-			
+
+				$override_attempts = 0;
 				if($customerUid) {
 					//Get the minumum role price later like client, right now getting last.
 					$rids = db_query("SELECT ur.rid FROM {users_roles} ur WHERE ur.uid = '%d'", $customerUid);
@@ -438,16 +439,22 @@ function pos_api_expose_ticket_update_customer() {
 						$nodes = db_query("SELECT uop.order_product_id, upprp.price FROM {uc_order_products} uop 
 							INNER JOIN {uc_price_per_role_prices} upprp on uop.nid = upprp.nid
 							WHERE uop.order_id = '%d' AND upprp.rid = '%d'", $ticketId, $rid);
+
+
 						while($node = db_fetch_object($nodes)) {
 							if($node->price) {
+								$override_attempts++;
 								$count = db_result(db_query("SELECT COUNT(*) FROM pos_api_expose_manager_override_log WHERE product_nid = '%d'", $node->order_product_id));
 								if($count == 0) {
 									db_query("UPDATE {uc_order_products} SET price = '%s' WHERE order_id = '%d' AND order_product_id = '%d'", $node->price, $ticketId, $node->order_product_id);
+									$i++;
 								}
 							}
 						}
 					}
-				} else {
+				}
+
+				if($customerUid == 0 || $override_attempts == 0) {
 					//Reset to sell price
 					$nodes = db_query("SELECT uop.order_product_id, up.sell_price FROM {uc_order_products} uop
 							 INNER JOIN {uc_products} up ON uop.nid = up.nid
