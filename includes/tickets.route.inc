@@ -427,7 +427,6 @@ function pos_api_expose_ticket_update_customer() {
 		if($uid) {
 			if($ticketId) {
 				db_query("UPDATE {uc_orders} SET uid = '%d' WHERE order_id = '%d'", $customerUid, $ticketId);
-				pos_api_expose_ticket_update_total_on_server($ticketId);
 
 				$override_attempts = 0;
 				if($customerUid) {
@@ -467,6 +466,8 @@ function pos_api_expose_ticket_update_customer() {
 						}
 					}
 				}
+
+				pos_api_expose_ticket_update_total_on_server($ticketId);
 			}
 
 			pos_api_expose_respond(array('status' => true, 'message' => 'Customer id has been set.'), true);
