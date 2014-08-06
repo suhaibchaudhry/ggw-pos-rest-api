@@ -73,6 +73,7 @@ if($uid) {
     </div>
 
     <div class="products">
+      <div class="total-balance" style="text-align: right; margin-bottom: 1em; font-size: 1.4em;"><strong>Total Remaining Balance: </strong><?php print $customer->credit_limits->pending_payments_view ?></div>
       <?php
       $header = array('#', 'Payment Date', 'Payment', 'Invoice #', 'Invoiced Amount', 'Settlement', 'Remaining Balance', 'Days');
       $rows = array();
@@ -89,6 +90,7 @@ if($uid) {
     </div>
 
     <div class="line-items">
+    <div class="total-balance" style="text-align: right; margin-bottom: 1em; font-size: 1.4em;"><strong>Total Remaining Balance: </strong><?php print $customer->credit_limits->pending_payments_view ?></div>
     <?php
     $items = split("\n", $payment->remarks);
     $payment_forms = array();
