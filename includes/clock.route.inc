@@ -17,6 +17,7 @@ function pos_api_expose_clockState() {
 	if(array_key_exists('request', $_POST)) {
 		$request = json_decode($_POST['request']);
 		$token = $request->token;
+		$register_id = $request->register_id;
 
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
@@ -61,6 +62,15 @@ function pos_api_expose_clockState() {
 				if($last_ticket->uid == 0 && $last_ticket->product_count == 0 && $last_ticket->order_status == 'pos_quote') {
 					$time = time();
 					db_query("UPDATE uc_orders SET `created` = '%s', `modified` = '%s' WHERE order_id = '%d'", $time, $time, $last_ticket->ticket_id);
+				}
+			}
+			if($last_ticket->ticket_id > 0 && !empty($register_id)) {
+				$lock_status = file_get_contents("http://www.general-goods.com/lock/index.php?ticket_id=".$last_ticket->ticket_id."&register_id=".$register_id."&op=acquire");
+				if(!empty($lock_status)) {
+					$lock_status = json_decode($lock_status);
+					if(!$lock_status->status) {
+						$last_ticket = false;
+					}
 				}
 			}
 			$response['last_ticket'] = $last_ticket;

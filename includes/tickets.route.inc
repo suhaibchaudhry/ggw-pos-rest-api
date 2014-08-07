@@ -379,7 +379,7 @@ function pos_api_expose_new_ticket() {
 
 	if(array_key_exists('request', $_POST)) {
 		$request = json_decode($_POST['request']);
-
+		$register_id = $request->register_id;
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			//Initial ticket is always for guest customers for now. Be set active user on ticket id change to
@@ -401,6 +401,7 @@ function pos_api_expose_new_ticket() {
 			$order->currency = 'USD';
 
 			drupal_write_record('uc_orders', $order);
+			$lock_status = file_get_contents("http://www.general-goods.com/lock/index.php?ticket_id=".$order->order_id."&register_id=".$register_id."&op=acquire");
 			pos_api_expose_respond(array('status' => true,
 										 'ticketId' => $order->order_id,
 										 'ticketStatus' =>$order->order_status,

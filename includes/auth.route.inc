@@ -18,6 +18,7 @@ function pos_api_expose_auth() {
 		$request = json_decode($_POST['request']);
 		$uname = $request->uname;
 		$pass = md5($request->pass);
+		$register_id = $request->register_id;
 		
 		$user = db_fetch_object(db_query("SELECT u.uid, COUNT(*) AS login_valid FROM {users} u WHERE u.name = '%s' AND u.pass = '%s'", $uname, $pass));
 
@@ -80,6 +81,15 @@ function pos_api_expose_auth() {
 				if($last_ticket->uid == 0 && $last_ticket->product_count == 0 && $last_ticket->order_status == 'pos_quote') {
 					$time = time();
 					db_query("UPDATE uc_orders SET `created` = '%s', `modified` = '%s' WHERE order_id = '%d'", $time, $time, $last_ticket->ticket_id);
+				}
+			}
+			if($last_ticket->ticket_id > 0 && !empty($register_id)) {
+				$lock_status = file_get_contents("http://www.general-goods.com/lock/index.php?ticket_id=".$last_ticket->ticket_id."&register_id=".$register_id."&op=acquire");
+				if(!empty($lock_status)) {
+					$lock_status = json_decode($lock_status);
+					if(!$lock_status->status) {
+						$last_ticket = false;
+					}
 				}
 			}
 			$response['last_ticket'] = $last_ticket;
