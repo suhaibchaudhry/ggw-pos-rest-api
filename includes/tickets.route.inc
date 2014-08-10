@@ -726,6 +726,8 @@ function pos_api_expose_process_rma() {
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			if($ticketId) {
+				pos_api_expose_ticket_update_total_on_server($ticketId);
+
 				$return_logs = db_query("SELECT pid FROM {pos_api_expose_rma_refund_log} WHERE rma_ticket_id = '%d'", $ticketId);
 				while($return_log = db_fetch_object($return_logs)) {
 					db_query("DELETE FROM {pos_api_expose_transaction_log} WHERE rma_pid = '%d'", $return_log->pid);
