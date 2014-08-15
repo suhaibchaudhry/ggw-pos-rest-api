@@ -106,19 +106,51 @@ if($uid) {
     }
 
     if($payment_forms['CHECK'] > 0) {
-    	$rows[] = array('CHECK', uc_currency_format($payment_forms['CHECK'], false));
+      $check_info = db_fetch_object(db_query("SELECT cash_date, check_number FROM user_term_credits_check_log WHERE sid = '%d'", $payment->sid));
+    	$content = '';
+
+      if($check_info->check_number) {
+        $content .= ' - '.$check_info->check_number;
+      }
+
+      if($check_info->cash_date) {
+        $content .= ' - '.$check_info->cash_date;
+      }
+
+      $rows[] = array('CHECK'.$content, uc_currency_format($payment_forms['CHECK'], false));
     }
 
     if($payment_forms['PCHECK'] > 0) {
-      $rows[] = array('POST DATED CHECK', uc_currency_format($payment_forms['PCHECK'], false));
+      $check_info = db_fetch_object(db_query("SELECT cash_date, check_number FROM user_term_credits_check_log WHERE sid = '%d'", $payment->sid));
+      $content = '';
+
+      if($check_info->check_number) {
+        $content .= ' - '.$check_info->check_number;
+      }
+
+      if($check_info->cash_date) {
+        $content .= ' - '.$check_info->cash_date;
+      }
+
+      $rows[] = array('POST DATED CHECK'.$content, uc_currency_format($payment_forms['PCHECK'], false));
     }
 
     if($payment_forms['MO'] > 0) {
-    	$rows[] = array('MONEY ORDER', uc_currency_format($payment_forms['MO'], false));
+      $content = '';
+      $reference = db_result(db_query("SELECT reference FROM user_term_credits_money_order_log WHERE sid = '%d'", $payment->sid));
+      if($reference) {
+        $content .= ' - '.$reference;
+      }
+    	$rows[] = array('MONEY ORDER'.$content, uc_currency_format($payment_forms['MO'], false));
     }
 
     if($payment_forms['CC'] > 0) {
-    	$rows[] = array('CREDIT CARD', uc_currency_format($payment_forms['CC'], false));
+      $content = '';
+      $transac_id = db_result(db_query("SELECT transaction_id FROM user_term_credits_credit_card_log WHERE sid = '%d'", $payment->sid));
+      if($transac_id) {
+        $content .= ' - '.$transac_id;
+      }
+    	$rows[] = array('CREDIT CARD'.$content, uc_currency_format($payment_forms['CC'], false));
     }
 
     print theme('table', array(), $rows);
