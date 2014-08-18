@@ -159,6 +159,7 @@ if($uid) {
     </div>
     <div class="payment-details">
       <?php print theme('table', array(), array(
+        array('<strong>Total Payment</strong>', uc_currency_format($total_payments_made)),
         array('<strong>Starting Balance</strong>', uc_currency_format($customer->credit_limits->pending_payments+$total_payments_made)),
         array('<strong>Ending Balance</strong>', $customer->credit_limits->pending_payments_view)
       )); ?>
