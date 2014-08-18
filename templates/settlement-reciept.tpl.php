@@ -75,13 +75,14 @@ if($uid) {
     <div class="products">
       <div class="total-balance" style="text-align: right; margin-bottom: 1em; font-size: 1.4em;"><strong>Total Remaining Balance: </strong><?php print $customer->credit_limits->pending_payments_view ?></div>
       <?php
+      $total_payments_made = 0;
       $header = array('#', 'Payment Date', 'Payment', 'Invoice #', 'Invoiced Amount', 'Settlement', 'Remaining Balance', 'Days');
       $rows = array();
       foreach($breakdown as $line_item) {
       	/*if($line_item->settlement_amount > 0 && $line_item->settlement_amount < .01) {
       		$line_item->settlement_amount = .01;
       	}*/
-
+        $total_payments_made += $line_item->settlement_amount;
       	$rows[] = array($line_item->sid, date("n/j/Y", $payment->settlement_date), user_term_credits_recursive_round($payment->paid), $line_item->order_id, uc_currency_format($line_item->credit_amount, false), uc_currency_format($line_item->settlement_amount, false), uc_currency_format($line_item->balance, false), (int)($line_item->days/86400));
       }
 
@@ -156,7 +157,12 @@ if($uid) {
     print theme('table', array(), $rows);
     ?>
     </div>
-    <div class="payment-details"></div>
+    <div class="payment-details">
+      <?php print theme('table', array(), array(
+        array('<strong>Starting Balance</strong>', uc_currency_format($customer->credit_limits->pending_payments+$total_payments_made)),
+        array('<strong>Ending Balance</strong>', $customer->credit_limits->pending_payments_view)
+      )); ?>
+    </div>
   </div>
 </body>
 </html>
