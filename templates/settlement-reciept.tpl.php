@@ -154,6 +154,10 @@ if($uid) {
     	$rows[] = array('CREDIT CARD'.$content, uc_currency_format($payment_forms['CC'], false));
     }
 
+    if($payment_forms['RMA'] > 0) {
+      $rows[] = array('RMA DEBIT', uc_currency_format($payment_forms['RMA'], false));
+    }
+
     print theme('table', array(), $rows);
     ?>
     </div>

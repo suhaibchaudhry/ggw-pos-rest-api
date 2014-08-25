@@ -96,7 +96,8 @@ function pos_api_expose_customer_info_payments() {
 		if($uid) {
 			if($customer_uid) {
 				$customer = user_load($customer_uid);
-				pos_api_expose_respond(array('status' => true, 'payments' => utc_credit_report_pos($customer)), true);
+				$rma_credits = db_result(db_query("SELECT IFNULL(SUM(total_refund),0) FROM {pos_api_expose_rma_refund_log} WHERE cuid = '%d' AND credit_usage_id = '0'", $customer_uid));
+				pos_api_expose_respond(array('status' => true, 'payments' => utc_credit_report_pos($customer), 'rma_credits' => $rma_credits), true);
 			}
 		}
 	}
