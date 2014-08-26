@@ -1352,6 +1352,14 @@ function pos_api_expose_credit_cash_checkout() {
 								if($mo) {
 									db_query("INSERT INTO {user_term_credits_money_order_log} (sid, paid_amount, reference) VALUES ('%d', '%s', '%s')", $sid, $mo_val, $mo_ref);
 								}
+								if($rma) {
+									$rma_pid = 0;
+									$sql = "INSERT INTO {pos_api_expose_rma_refund_log} (uid, cuid, total_refund, `timestamp`) VALUES ('%d', '%d', '-%s', '%s')";
+									db_query($sql, $uid, $cuid, $rma_value, time());
+									$rma_pid = db_last_insert_id('pos_api_expose_rma_refund_log', 'pid');
+
+									db_query("INSERT INTO {user_term_credits_rma_log} (sid, paid_amount, rma_pid) VALUES ('%d', '%s', '%d')", $sid, $rma_value, $rma_pid);
+								}
 							}
 						}
 					}
