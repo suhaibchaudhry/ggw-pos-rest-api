@@ -1035,6 +1035,11 @@ function pos_api_expose_ticket_partial_checkout() {
 				$rma = $request->rma_credit_used;
 				$rma_credit = $request->rma_credit;
 
+				$ar_used = $request->ar_used;
+				$ar_val = $request->ar_val;
+				$term_limit = $request->term_limit;
+				$due = ((int)$term_limit*86400)+time();
+
 				//$credit = $request->credit;
 				//$credit_val = $request->credit_val;
 				//$transac_id = $request->transac_id;
@@ -1089,9 +1094,16 @@ function pos_api_expose_ticket_partial_checkout() {
 							$rma_pid = db_last_insert_id('pos_api_expose_rma_refund_log', 'pid');
 						}
 
-						$sql = "INSERT INTO {".$transac_log_table."} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`, rma_pid)
-							VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%d')";
-						db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time(), $rma_pid);
+						$ar_pid = 0;
+						if($ar_used) {
+							db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled)
+							VALUES ('%d', '%d', '%s', '%d', '%s', '%s', '%d')", $cuid, $ticketId, $ar_val, $term_limit, time(), $due, 0);
+							$ar_pid = db_last_insert_id('user_term_credits_usages', 'cuid');
+						}
+
+						$sql = "INSERT INTO {".$transac_log_table."} (uid, cuid, ticket_id, amount, credit_usage_id, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`, rma_pid)
+							VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d')";
+						db_query($sql, $uid, $cuid, $ticketId, $total, $ar_pid, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time(), $rma_pid);
 
 						_pos_api_expose_stock_adjustment($ticketId);
 
@@ -1159,6 +1171,11 @@ function pos_api_expose_ticket_cash_checkout() {
 		$rma = $request->rma_credit_used;
 		$rma_credit = $request->rma_credit;
 
+		$ar_used = $request->ar_used;
+		$ar_val = $request->ar_val;
+		$term_limit = $request->term_limit;
+		$due = ((int)$term_limit*86400)+time();
+
 		$credit = $request->credit;
 		$credit_val = $request->credit_val;
 		$transac_id = $request->transac_id;
@@ -1193,6 +1210,13 @@ function pos_api_expose_ticket_cash_checkout() {
 				$check_pid = db_last_insert_id($check_log_table, 'pid');
 			}
 
+			$ar_pid = 0;
+			if($ar_used) {
+				db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled)
+				VALUES ('%d', '%d', '%s', '%d', '%s', '%s', '%d')", $cuid, $ticketId, $ar_val, $term_limit, time(), $due, 0);
+				$ar_pid = db_last_insert_id('user_term_credits_usages', 'cuid');
+			}
+
 			$mo_pid = 0;
 			if($mo) {
 				$sql = "INSERT INTO {".$mo_log_table."} (uid, cuid, ticket_id, paid_amount, reference, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', '%s')";
@@ -1214,9 +1238,9 @@ function pos_api_expose_ticket_cash_checkout() {
 				$rma_pid = db_last_insert_id('pos_api_expose_rma_refund_log', 'pid');
 			}
 
-			$sql = "INSERT INTO {".$transac_log_table."} (uid, cuid, ticket_id, amount, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`, rma_pid)
-				VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%s', '%s', '%d')";
-			db_query($sql, $uid, $cuid, $ticketId, $total, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time(), $rma_pid);
+			$sql = "INSERT INTO {".$transac_log_table."} (uid, cuid, ticket_id, amount, credit_usage_id, cash_pid, cc_pid, check_pid, mo_pid, register_id, `timestamp`, rma_pid)
+				VALUES ('%d', '%d', '%d', '%s', '%d', '%d', '%d', '%d', '%d', '%s', '%s', '%d')";
+			db_query($sql, $uid, $cuid, $ticketId, $total, $ar_pid, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time(), $rma_pid);
 
 			_pos_api_expose_stock_adjustment($ticketId);
 
