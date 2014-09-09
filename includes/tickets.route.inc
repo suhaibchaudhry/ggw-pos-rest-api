@@ -526,11 +526,13 @@ function pos_api_expose_ticket_current() {
 	pos_api_expose_respond($failed_response);
 }
 
-function pos_api_expose_ticket_search($token, $query) {
+function pos_api_expose_ticket_search($token) {
 	if(!empty($token)) {
 		$uid = _pos_api_expose_uid_from_token($token);
 
 		if($uid) {
+			$query = $_GET['searchQuery'];
+
 			//By Search Company Name with Fluid Revelevance
 			$fulltext_sql = "SELECT nv.vid, MATCH(nv.title) AGAINST ('%s') AS relevance
 							 FROM {node_revisions} nv

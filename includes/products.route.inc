@@ -222,10 +222,12 @@ function _pos_api_expose_rma_all_item_search($item_barcode) {
 	return db_query($sql, $item_barcode, $item_barcode, $item_barcode);
 }
 
-function pos_api_expose_product_search($token, $query) {
+function pos_api_expose_product_search($token) {
 	if(!empty($token)) {
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
+			$query = $_GET['searchQuery'];			
+
 			$additional_barcode_sql = "SELECT cfab.vid FROM {content_field_additional_barcodes} cfab WHERE cfab.field_additional_barcodes_value LIKE '%s%%'";
 
 			$sku_sql = "SELECT p.vid, 1 AS relevance
