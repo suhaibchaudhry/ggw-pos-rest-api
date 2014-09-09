@@ -244,7 +244,7 @@ function pos_api_expose_menu() {
     'file' => 'includes/tickets.route.inc'
   );
 
-	$routers['pos-api/tickets/%/%'] = array(
+	$routers['pos-api/tickets/%'] = array(
 		'title' => 'Search Tickets',
 		'description' => 'Search for tickets by ticket id or customer info.',
 	  'page callback' => 'pos_api_expose_ticket_search',
@@ -254,7 +254,7 @@ function pos_api_expose_menu() {
 	  'file' => 'includes/tickets.route.inc'
 	);
 
-	$routers['pos-api/products/%/%'] = array(
+	$routers['pos-api/products/%'] = array(
 		'title' => 'Search Products',
 		'description' => 'Search for products by name or sku.',
 	  'page callback' => 'pos_api_expose_product_search',
@@ -264,7 +264,7 @@ function pos_api_expose_menu() {
 	  'file' => 'includes/products.route.inc'
 	);
 
-	$routers['pos-api/customers/%/%'] = array(
+	$routers['pos-api/customers/%'] = array(
 		'title' => 'Search Customers',
 		'description' => 'Search for customer by company name, number, address or other field keywords.',
 	  'page callback' => 'pos_api_expose_customer_search',
