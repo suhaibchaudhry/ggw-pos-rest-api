@@ -1296,6 +1296,10 @@ function pos_api_expose_credit_cash_checkout() {
 			$rma = $request->rma;
 			$rma_value = $request->rma_value;
 
+			if($request->stash_change) {
+				db_query("INSERT INTO pos_api_expose_rma_refund_log (uid, cuid, credit_usage_id, total_refund, `timestamp`, rma_ticket_id) VALUES ('%d', '%d', '0', '%s', '%s', '0')", $uid, $cuid, $change, time());
+			}
+
 			$settlement_amount = bcsub($cash, $change, 6);
 
 			$time = time();
