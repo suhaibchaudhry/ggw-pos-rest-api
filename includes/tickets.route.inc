@@ -1296,7 +1296,8 @@ function pos_api_expose_credit_cash_checkout() {
 			$rma = $request->rma;
 			$rma_value = $request->rma_value;
 
-			if($request->stash_change) {
+			$stash_change = $request->stash_change;
+			if($stash_change) {
 				db_query("INSERT INTO pos_api_expose_rma_refund_log (uid, cuid, credit_usage_id, total_refund, `timestamp`, rma_ticket_id) VALUES ('%d', '%d', '0', '%s', '%s', '0')", $uid, $cuid, $change, time());
 			}
 
@@ -1337,7 +1338,7 @@ function pos_api_expose_credit_cash_checkout() {
 								VALUES ('%d', '%s', '%s', '%s', '%s', '%d', '%s')", $usage->cuid, $settlement_amount, 'pos_payment', $remarks, $time, $uid, $register_id);
 							if(!empty($remarks)) {
 								$sid = db_last_insert_id('user_term_credits_settlements', 'sid');
-								db_query("INSERT INTO {user_term_credits_cash_log} (sid, amount_paid, `change`, total) VALUES ('%d', '%s', '%s', '%s')", $sid, $cash_value, $change, $cash);
+								db_query("INSERT INTO {user_term_credits_cash_log} (sid, amount_paid, `change`, total, stash) VALUES ('%d', '%s', '%s', '%s', '%s')", $sid, $cash_value, $change, $cash, $stash_change);
 								if($check) {
 									db_query("INSERT INTO {user_term_credits_check_log} (sid, paid_amount, check_number, post_dated, cash_date) VALUES ('%d', '%s', '%s', '%d', '%s')", $sid, $check_val, $check_number, $post_dated, $check_date);
 								}
@@ -1372,7 +1373,7 @@ function pos_api_expose_credit_cash_checkout() {
 							$settlement_amount = bcsub($settlement_amount, $usage->credit_amount, 6);
 							if(!empty($remarks)) {
 								$sid = db_last_insert_id('user_term_credits_settlements', 'sid');
-								db_query("INSERT INTO {user_term_credits_cash_log} (sid, amount_paid, `change`, total) VALUES ('%d', '%s', '%s', '%s')", $sid, $cash_value, $change, $cash);
+								db_query("INSERT INTO {user_term_credits_cash_log} (sid, amount_paid, `change`, total, stash) VALUES ('%d', '%s', '%s', '%s', '%s')", $sid, $cash_value, $change, $cash, $stash_change);
 								if($check) {
 									db_query("INSERT INTO {user_term_credits_check_log} (sid, paid_amount, check_number, post_dated, cash_date) VALUES ('%d', '%s', '%s', '%d', '%s')", $sid, $check_val, $check_number, $post_dated, $check_date);
 								}
