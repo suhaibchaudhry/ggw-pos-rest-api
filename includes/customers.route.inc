@@ -237,7 +237,7 @@ function pos_api_expose_customer_search($token) {
 
 			$company_name = "SELECT nv.vid, 15 AS relevance
 							 FROM node_revisions nv
-							 WHERE UPPER(nv.title) LIKE UPPER('%%%s%%')";
+							 WHERE UPPER(nv.title) LIKE UPPER('%s%%')";
 
 			//Search by Account ID
 			$accountid_search = "SELECT n.vid, 10 AS relevance
