@@ -418,3 +418,51 @@ function pos_api_expose_product_scan() {
 
 	pos_api_expose_respond($failed_response);
 }
+
+function pos_api_expose_product_price_history() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not find products in customer history.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$token = $request->token;
+		$uid = _pos_api_expose_uid_from_token($token);
+		if($uid) {
+			$product_id = $request->product_id;
+			$cuid = $request->cuid;
+
+			$products = array();
+
+			$sql = "SELECT ucp.price, IFNULL(mol.qty_split, 1) AS qty_split, IFNULL(mol.timestamp, uo.modified) AS price_date FROM uc_order_products ucp
+			INNER JOIN {uc_orders} uo ON uo.order_id = ucp.order_id
+			LEFT JOIN {pos_api_expose_manager_override_log} mol ON ucp.order_product_id = mol.product_nid
+			WHERE ucp.nid IN (SELECT ucpi.nid FROM {uc_order_products} ucpi WHERE ucpi.order_product_id = '%d') AND uo.uid = '%d'
+			ORDER BY price_date DESC";
+
+			$product_items = db_query($sql, $product_id, $cuid);
+
+			while($product = db_fetch_object($product_items)) {
+				$product->price_date = date("n/j/Y", $product->price_date);
+				$products[] = $product;
+			}
+
+			if(count($products) > 0) {
+				$response = array(
+					'status' => true,
+					'product' => $products
+				);
+			} else {
+				$response = array(
+					'status' => false,
+					'error' => 'No product history was found.'
+				);
+			}
+
+			pos_api_expose_respond($response, true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}

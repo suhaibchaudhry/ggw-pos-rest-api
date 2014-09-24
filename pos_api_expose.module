@@ -392,6 +392,15 @@ function pos_api_expose_menu() {
     'file' => 'includes/tickets.route.inc'
   );
 
+  $routers['pos-api/ticket/product/price-history'] = array(
+    'title' => 'Product Price History',
+    'description' => 'Return customer price history for product.',
+    'page callback' => 'pos_api_expose_product_price_history',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/products.route.inc'
+  );
+
   $routers['admin/invoice/print/%'] = array(
     'title' => 'Printable invoice',
     'page arguments' => array(3),
