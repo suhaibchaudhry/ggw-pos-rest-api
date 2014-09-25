@@ -73,7 +73,7 @@ function pos_api_expose_ticket_totals() {
 	pos_api_expose_respond($failed_response);
 }
 
-function _pos_api_expose_employee_order_history($uid) {
+function _pos_api_expose_employee_order_history($uid, $searchQuery) {
   $header = array(
   	array('data' => t('Last Opened')),
     array('data' => t('Order #')),
@@ -89,8 +89,20 @@ function _pos_api_expose_employee_order_history($uid) {
     'revision' => 'themed-original',
     'type' => 'amount',
   );
+
+  $injection = '';
+  if($searchQuery) {
+  	$searchQueryi = db_escape_string($searchQuery);
+  	$injection = " (uc.order_id = '".$searchQueryi."' OR UPPER(u.name) LIKE UPPER('".$searchQueryi."%%')) AND ";
+  }
+
   $list = uc_order_status_list('general', TRUE);
-  $result = pager_query("SELECT uc.order_id, uc.uid, uc.created, uc.order_total AS total, log.timestamp, os.title FROM (SELECT * FROM {pos_api_expose_ticket_log} tl GROUP BY ticket_id ORDER BY MAX(timestamp) DESC) log INNER JOIN uc_orders uc ON log.ticket_id = uc.order_id INNER JOIN uc_order_statuses os ON uc.order_status = os.order_status_id WHERE log.uid = '%d'", 20, 0, "SELECT COUNT(*) FROM (SELECT * FROM {pos_api_expose_ticket_log} tl GROUP BY ticket_id ORDER BY MAX(timestamp) DESC) t2 WHERE t2.uid = '%d'", $uid);
+
+  if($injection) {
+  	$result = db_query("SELECT u.name, uc.order_id, uc.uid, uc.created, uc.order_total AS total, log.timestamp, os.title FROM (SELECT * FROM {pos_api_expose_ticket_log} tl GROUP BY ticket_id ORDER BY MAX(timestamp) DESC) log INNER JOIN uc_orders uc ON log.ticket_id = uc.order_id INNER JOIN uc_order_statuses os ON uc.order_status = os.order_status_id INNER JOIN users u ON u.uid = uc.uid WHERE ".$injection." log.uid = '%d'", $uid);
+  } else {
+  	$result = pager_query("SELECT uc.order_id, uc.uid, uc.created, uc.order_total AS total, log.timestamp, os.title FROM (SELECT * FROM {pos_api_expose_ticket_log} tl) log INNER JOIN uc_orders uc ON log.ticket_id = uc.order_id INNER JOIN uc_order_statuses os ON uc.order_status = os.order_status_id WHERE log.uid = '%d' GROUP BY ticket_id ORDER BY MAX(timestamp) DESC", 20, 0, "SELECT COUNT(*) FROM (SELECT tl.ticket_id, tl.timestamp FROM {pos_api_expose_ticket_log} tl INNER JOIN uc_orders uc ON tl.ticket_id = uc.order_id INNER JOIN uc_order_statuses os ON uc.order_status = os.order_status_id WHERE tl.uid = '%d' GROUP BY tl.ticket_id ORDER BY MAX(tl.timestamp) DESC) log", $uid);
+  }
 
   // Build a table based on the customer's orders.
   while ($order = db_fetch_object($result)) {
@@ -116,8 +128,11 @@ function _pos_api_expose_employee_order_history($uid) {
     $rows[] = array(array('data' => t('No orders available.'), 'colspan' => 6));
   }
 
-  $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'))
-       . theme('pager', NULL, 20, 0);
+  $content = theme('table', $header, $rows, array('class' => 'pure-table uc-order-history'));
+  
+  if($injection == '') {
+  	$content .= theme('pager', NULL, 20, 0);
+  }
 
   return str_replace('src="/misc/', 'src="images/misc/', $content);
 }
@@ -363,7 +378,7 @@ function pos_api_expose_recent_invoices() {
 		$uid = _pos_api_expose_uid_from_token($request->token);
 
 		if($uid) {
-			$invoices = _pos_api_expose_employee_order_history($uid);
+			$invoices = _pos_api_expose_employee_order_history($uid, $request->searchQuery);
 			pos_api_expose_respond(array('status' => true, 'content' => $invoices), true);
 		}
 	}
