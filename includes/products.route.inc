@@ -435,12 +435,12 @@ function pos_api_expose_product_price_history() {
 
 			$products = array();
 
-			$sql = "SELECT ucp.price, IFNULL(mol.qty_split, 1) AS qty_split, MAX(IFNULL(mol.timestamp, uo.modified)) AS price_date FROM uc_order_products ucp
+			$sql = "SELECT * FROM (SELECT ucp.order_product_id, IFNULL(unit_price, ucp.price) AS price, IFNULL(mol.qty_split, 1) AS qty_split, MAX(IFNULL(mol.timestamp, uo.modified)) AS price_date FROM uc_order_products ucp
 			INNER JOIN {uc_orders} uo ON uo.order_id = ucp.order_id
 			LEFT JOIN {pos_api_expose_manager_override_log} mol ON ucp.order_product_id = mol.product_nid
 			WHERE ucp.nid IN (SELECT ucpi.nid FROM {uc_order_products} ucpi WHERE ucpi.order_product_id = '%d') AND uo.uid = '%d'
-			GROUP BY ucp.price, qty_split
-			ORDER BY price_date DESC";
+			GROUP BY price, qty_split
+			ORDER BY price_date DESC) his GROUP BY his.price, his.qty_split";
 
 			$product_items = db_query($sql, $product_id, $cuid);
 
