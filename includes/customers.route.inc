@@ -83,6 +83,28 @@ function pos_api_expose_customer_invoices() {
 	pos_api_expose_respond($failed_response);
 }
 
+function pos_api_expose_customer_block() {
+	$failed_response = array(
+		'status' => false,
+		'message' => 'Could not get disable customer.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$customer_uid = $request->customer_uid;
+		$uid = _pos_api_expose_uid_from_token($request->token);
+
+		if($uid) {
+			if($customer_uid) {
+				db_query("UPDATE {users} u SET u.status = '0' WHERE u.uid = '%d'", $customer_uid);
+				pos_api_expose_respond(array('status' => true, 'message' => 'Customer was disabled.'), true);
+			}
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
+
 function pos_api_expose_customer_info_payments() {
 	$failed_response = array(
 		'status' => false,

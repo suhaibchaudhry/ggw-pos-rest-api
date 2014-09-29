@@ -328,6 +328,15 @@ function pos_api_expose_menu() {
 	  'file' => 'includes/customers.route.inc'
 	);
 
+  $routers['pos-api/customer/block'] = array(
+    'title' => 'Block customer RPC.',
+    'description' => 'Disable a provided customer.',
+    'page callback' => 'pos_api_expose_customer_block',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/customers.route.inc'
+  );
+
 	$routers['pos-api/employee/recent-tickets'] = array(
 		'title' => 'Get Recent Tickets',
 		'description' => 'Get AHAH recent ticket list.',
