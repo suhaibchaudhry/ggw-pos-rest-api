@@ -439,8 +439,8 @@ function pos_api_expose_product_price_history() {
 			INNER JOIN {uc_orders} uo ON uo.order_id = ucp.order_id
 			LEFT JOIN {pos_api_expose_manager_override_log} mol ON ucp.order_product_id = mol.product_nid
 			WHERE ucp.nid IN (SELECT ucpi.nid FROM {uc_order_products} ucpi WHERE ucpi.order_product_id = '%d') AND uo.uid = '%d'
-			GROUP BY price, qty_split
-			ORDER BY price_date DESC) his WHERE his.order_status IN ('pos_completed', 'pos_return_closed') GROUP BY his.price, his.qty_split ORDER BY price_date DESC";
+			GROUP BY price, qty_split, order_status
+			ORDER BY price_date DESC) his WHERE his.order_status IN ('pos_completed', 'pos_return_closed') GROUP BY his.price, his.qty_split, his.order_status ORDER BY price_date DESC";
 
 			$product_items = db_query($sql, $product_id, $cuid);
 
