@@ -696,7 +696,7 @@ function pos_api_expose_ticket_update_total_on_server($ticketId) {
 	//Create Tax Line Item
 	uc_order_module_invoke('save', $order, NULL);
 	//Refresh to calculate current Price
-	uc_order_load($ticketId);
+	return uc_order_load($ticketId);
 }
 
 function pos_api_expose_get_order_total($ticketId) {
@@ -743,7 +743,7 @@ function pos_api_expose_process_rma() {
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
 			if($ticketId) {
-				pos_api_expose_ticket_update_total_on_server($ticketId);
+				$order = pos_api_expose_ticket_update_total_on_server($ticketId);
 
 				$return_logs = db_query("SELECT pid FROM {pos_api_expose_rma_refund_log} WHERE rma_ticket_id = '%d'", $ticketId);
 				while($return_log = db_fetch_object($return_logs)) {
@@ -756,9 +756,9 @@ function pos_api_expose_process_rma() {
 
 				//Delete current RMA logs
 				$rma_products = db_query("SELECT nid, qty, price FROM uc_order_products WHERE order_id = '%d'", $ticketId);
-				$amount_returned = 0;
+				$amount_returned = $order->order_total;
 				while($rma_product = db_fetch_object($rma_products)) {
-					$amount_returned += $rma_product->price*$rma_product->qty;
+					//$amount_returned += $rma_product->price*$rma_product->qty;
 					$purchased_items = db_query("SELECT uop.order_product_id, uo.created, uop.order_id, uop.nid, uop.title, uop.model, uop.price, uop.qty, ctp.field_prod_packing_value, f.filepath, (uop.qty-IFNULL(rma.qty_returned,0)) AS remaining_qty
 						FROM {uc_order_products} uop
 						INNER JOIN {uc_orders} uo ON uop.order_id = uo.order_id
