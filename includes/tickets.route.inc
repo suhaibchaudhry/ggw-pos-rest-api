@@ -1433,6 +1433,8 @@ function _pos_api_expose_stock_adjustment($ticketId) {
 	while($product = db_fetch_object($products)) {
 		db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $product->nid, $product->qty, $product->price, time());
 	}
+
+	db_query("UPDATE {uc_orders} uo SET uo.created = '%s', uo.modified = '%s' WHERE uo.order_id = '%d'", time(), time(), $ticketId);
 }
 
 function pos_api_expose_credit_checkout() {
