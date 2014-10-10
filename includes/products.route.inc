@@ -296,7 +296,9 @@ function pos_api_expose_load_ticket_products() {
 			LEFT JOIN {content_field_image_cache} cfic ON n.vid = cfic.vid
         		LEFT JOIN {files} f ON f.fid = cfic.field_image_cache_fid
         		LEFT JOIN {content_type_product} ctp_wrap ON n.vid = ctp_wrap.vid
-        		WHERE order_id = '%d'";
+        		WHERE order_id = '%d'
+
+        	ORDER BY order_product_id ASC";
 
     		$items = db_query($sql, $ticketId);
 			$dataset = array();
