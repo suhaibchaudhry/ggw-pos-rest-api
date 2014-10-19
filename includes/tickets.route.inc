@@ -634,7 +634,7 @@ function pos_api_expose_ticket_add_product() {
 
 
 			$order_product->cost = pos_stock_management_average_cost($order_product->nid);
-			if(empty($order_product->cost)) {
+			if($order_product->cost == 0) {
 				//Use default automagic cost.
 				$order_product->cost = db_result(db_query("SELECT cost FROM {uc_products} WHERE nid = '%d'", $order_product->nid));
 			}
@@ -1506,7 +1506,7 @@ function pos_api_expose_rma_create_ticket() {
 				$order_product->price = $product->price;
 
 				$order_product->cost = pos_stock_management_average_cost($order_product->nid);
-				if(empty($order_product->cost)) {
+				if($order_product->cost == 0) {
 					//Use default automagic cost.
 					$order_product->cost = db_result(db_query("SELECT cost FROM {uc_products} WHERE nid = '%d'", $order_product->nid));
 				}
