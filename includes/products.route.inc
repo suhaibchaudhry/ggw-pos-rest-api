@@ -14,6 +14,10 @@ function _pos_api_expose_get_category($nid) {
 }
 
 function _pos_api_expose_map_product_datum($item, $special_price = true, $ticketId = FALSE, $unhistoric = true) {
+	if(empty($item)) {
+		$item = new stdClass();
+	}
+
 	if(empty($item->filepath)) {
 		$item->filepath = 'sites/general-goods.com/files/imagefield_default_images/notfound_0.png';
 	}
