@@ -903,6 +903,7 @@ function pos_api_expose_ticket_swipe_checkout() {
 	if(array_key_exists('request', $_POST)) {
 		$request = json_decode($_POST['request']);
 		$zone = $request->zone;
+		$ticketId = $request->ticketId;
 		$uid = _pos_api_expose_uid_from_token($request->token);
 
 		if($uid) {
@@ -914,6 +915,8 @@ function pos_api_expose_ticket_swipe_checkout() {
 			} else {
 				$cc_log_table = 'pos_api_expose_credit_card_log';
 				$transac_log_table = 'pos_api_expose_transaction_log';
+
+				_pos_api_expose_clear_previous_payments($ticketId);
 			}
 
 			$test_mode = variable_get('pos_api_expose_testing_enabled', 1);
@@ -931,7 +934,6 @@ function pos_api_expose_ticket_swipe_checkout() {
 				define("AUTHORIZENET_API_LOGIN_ID", $api_login);
 				define("AUTHORIZENET_TRANSACTION_KEY", $transac_key);
 
-				$ticketId = $request->ticketId;
 				$cuid = $request->customer;
 				//$total = pos_api_expose_get_order_total($ticketId);
 				$total = $request->total;
@@ -1000,6 +1002,7 @@ function pos_api_expose_ticket_partial_checkout() {
 		$request = json_decode($_POST['request']);
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		$zone = $request->zone;
+		$ticketId = $request->ticketId;
 
 		if($uid) {
 			module_load_include('php', 'pos_api_expose', 'includes/anet_php_sdk/AuthorizeNet');
@@ -1015,6 +1018,8 @@ function pos_api_expose_ticket_partial_checkout() {
 				$mo_log_table = 'pos_api_expose_money_order_log';
 				$cc_log_table = 'pos_api_expose_credit_card_log';
 				$transac_log_table = 'pos_api_expose_transaction_log';
+
+				_pos_api_expose_clear_previous_payments($ticketId);
 			}
 
 			$test_mode = variable_get('pos_api_expose_testing_enabled', 1);
@@ -1032,7 +1037,6 @@ function pos_api_expose_ticket_partial_checkout() {
 				define("AUTHORIZENET_API_LOGIN_ID", $api_login);
 				define("AUTHORIZENET_TRANSACTION_KEY", $transac_key);
 
-				$ticketId = $request->ticketId;
 				//$total = pos_api_expose_get_order_total($ticketId);
 				$total = $request->total;
 				$cash = $request->cash;
@@ -1215,6 +1219,8 @@ function pos_api_expose_ticket_cash_checkout() {
 				$mo_log_table = 'pos_api_expose_money_order_log';
 				$cc_log_table = 'pos_api_expose_credit_card_log';
 				$transac_log_table = 'pos_api_expose_transaction_log';
+
+				_pos_api_expose_clear_previous_payments($ticketId);
 			}
 
 			$sql = "INSERT INTO {".$cash_log_table."} (uid, cuid, ticket_id, amount_paid, `change`, total, `timestamp`) VALUES ('%d', '%d', '%d', '%s', '%s', '%s', '%s')";
@@ -1458,6 +1464,8 @@ function pos_api_expose_credit_checkout() {
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
+			_pos_api_expose_clear_previous_payments($ticketId);
+
 			db_query("INSERT INTO {user_term_credits_usages} (uid, order_id, credit_amount, term_limit, consumption_date, due_date, settled)
 				VALUES ('%d', '%d', '%s', '%d', '%s', '%s', '%d')", $cuid, $ticketId, $total, $term_limit, time(), $due, 0);
 			$credit_usage_id = db_last_insert_id('user_term_credits_usages', 'cuid');
