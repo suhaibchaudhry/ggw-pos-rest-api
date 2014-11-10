@@ -290,7 +290,7 @@ function pos_api_expose_load_ticket_products() {
 		$uid = _pos_api_expose_uid_from_token($token);
 		if($uid) {
 			_pos_api_expose_log_ticket_load($uid, $ticketId);
-			
+
 			$sql = "SELECT n.nid, n.vid, n.title, p.model, p.list_price, uo.price AS sell_price, f.filepath, ctp_wrap.field_prod_packing_value, uo.qty, uo.order_product_id
 			FROM {uc_order_products} uo
 
@@ -309,7 +309,9 @@ function pos_api_expose_load_ticket_products() {
 			$zone = db_result(db_query("SELECT billing_zone FROM uc_orders WHERE order_id = '%d'", $ticketId));
 			while($item = db_fetch_object($items)) {
 				$dataset[] = _pos_api_expose_map_product_datum($item, true, $ticketId);
-			}	
+			}
+
+			pos_api_log_ticket_event($ticketId, $uid, 'Ticket opened by employee: ');
 
 			pos_api_expose_respond(array('status' => true, 'zone' => $zone, 'products' => $dataset), true);
 		}
