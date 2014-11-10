@@ -964,6 +964,8 @@ function pos_api_expose_ticket_swipe_checkout() {
 
 						_pos_api_expose_stock_adjustment($ticketId);
 
+						pos_api_log_ticket_event($ticketId, $uid, 'Ticket was checked out in the amount of '.uc_currency_format($total).' by employee: ');
+
 						pos_api_expose_respond(
 							array("status" => true,
 								  "message" => "Credit card payment successful.")
@@ -1130,6 +1132,8 @@ function pos_api_expose_ticket_partial_checkout() {
 
 						_pos_api_expose_stock_adjustment($ticketId);
 
+						pos_api_log_ticket_event($ticketId, $uid, 'Ticket was checked out in the amount of '.uc_currency_format($total).' by employee: ');
+
 						pos_api_expose_respond(
 							array("status" => true,
 								  "message" => "Credit card payment successful.")
@@ -1268,6 +1272,8 @@ function pos_api_expose_ticket_cash_checkout() {
 			db_query($sql, $uid, $cuid, $ticketId, $total, $ar_pid, $cash_pid, $credit_pid, $check_pid, $mo_pid, $register_id, time(), $rma_pid);
 
 			_pos_api_expose_stock_adjustment($ticketId);
+
+			pos_api_log_ticket_event($ticketId, $uid, 'Ticket was checked out in the amount of '.uc_currency_format($total).' by employee: ');
 
 			pos_api_expose_respond(
 				array("status" => true,
@@ -1473,6 +1479,9 @@ function pos_api_expose_credit_checkout() {
 				VALUES ('%d', '%d', '%d', '%s', '%d', '%s', '%s')";
 			db_query($sql, $uid, $cuid, $ticketId, $total, $credit_usage_id, $register_id, time());
 			_pos_api_expose_stock_adjustment($ticketId);
+
+			pos_api_log_ticket_event($ticketId, $uid, 'Ticket was checked out in the amount of '.uc_currency_format($total).' by employee: ');
+
 			pos_api_expose_respond(array('status' => true, 'message' => 'Purchase complete.'), true);
 		}
 	}
