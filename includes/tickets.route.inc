@@ -1444,8 +1444,12 @@ function pos_api_expose_credit_cash_checkout() {
 function _pos_api_expose_stock_adjustment($ticketId) {
 	$products = db_query("SELECT nid, qty, price FROM {uc_order_products} WHERE order_id = '%d'", $ticketId);
 
+	if($ticketId) {
+		db_query("DELETE FROM {pos_out_stock_management} WHERE ticket_id = '%d'", $ticketId);
+	}
+
 	while($product = db_fetch_object($products)) {
-		db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $product->nid, $product->qty, $product->price, time());
+		db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`, ticket_id) VALUES ('%d', '%d', '%s', '%s', '%d')", $product->nid, $product->qty, $product->price, time(), $ticketId);
 	}
 
 	db_query("UPDATE {uc_orders} uo SET uo.created = '%s', uo.modified = '%s' WHERE uo.order_id = '%d'", time(), time(), $ticketId);
