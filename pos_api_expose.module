@@ -244,6 +244,15 @@ function pos_api_expose_menu() {
     'file' => 'includes/tickets.route.inc'
   );
 
+  $routers['pos-api/ticket/unlock-ticket'] = array(
+    'title' => 'Unlock Ticket',
+    'description' => 'Unlock ticket callback.',
+    'page callback' => 'pos_api_expose_unlock_ticket_event',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/tickets.route.inc'
+  );
+
 	$routers['pos-api/tickets/%'] = array(
 		'title' => 'Search Tickets',
 		'description' => 'Search for tickets by ticket id or customer info.',

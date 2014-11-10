@@ -1686,3 +1686,25 @@ function pos_api_expose_manager_override() {
 
 	pos_api_expose_respond($failed_response);
 }
+
+function pos_api_expose_unlock_ticket_event() {
+	$failed_response = array(
+		'status' => false,
+		'error' => 'Could not report ticket unlock event.'
+	);
+
+	if(array_key_exists('request', $_POST)) {
+		$request = json_decode($_POST['request']);
+		$ticketId = $request->ticketId;
+
+		$uid = _pos_api_expose_uid_from_token($request->token);
+		if($uid) {
+			pos_api_log_ticket_event($ticketId, $uid, 'Ticket unlocked by employee: ');
+
+			pos_api_expose_respond(array('status' => true,
+										 'message' => 'successfully reported ticket unlock event.'), true);
+		}
+	}
+
+	pos_api_expose_respond($failed_response);
+}
