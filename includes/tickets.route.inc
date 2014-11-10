@@ -1701,8 +1701,11 @@ function pos_api_expose_unlock_ticket_event() {
 		if($uid) {
 			pos_api_log_ticket_event($ticketId, $uid, 'Ticket unlocked by employee: ');
 
+			$create_date = db_result(db_query("SELECT created FROM uc_orders WHERE order_id = '%d'", $ticketId));
+			$allow_recheckout = (time()-$create_date) < 1209600;
+
 			pos_api_expose_respond(array('status' => true,
-										 'message' => 'successfully reported ticket unlock event.'), true);
+										 'message' => 'successfully reported ticket unlock event.', 'recheckout' => $allow_recheckout), true);
 		}
 	}
 
