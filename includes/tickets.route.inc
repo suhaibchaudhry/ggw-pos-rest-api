@@ -1714,3 +1714,37 @@ function pos_api_expose_unlock_ticket_event() {
 
 	pos_api_expose_respond($failed_response);
 }
+
+function _pos_api_expose_clear_previous_payments($ticketId) {
+	if($ticketId) {
+		$transactions = db_query("SELECT tl.pid, tl.credit_usage_id, tl.cash_pid, tl.rma_pid, tl.cc_pid, tl.check_pid, tl.mo_pid FROM pos_api_expose_transaction_log tl WHERE tl.ticket_id = '%d'", $ticketId);
+
+		while($transaction = db_fetch_object($transactions)) {
+			if($transaction->rma_pid) {
+				db_query("DELETE FROM pos_api_expose_rma_refund_log WHERE pid = '%d' AND rma_ticket_id = '0'", $transaction->rma_pid);
+			}
+
+			if($transaction->credit_usage_id) {
+				db_query("DELETE FROM user_term_credits_usages WHERE cuid = '%d'", $transaction->credit_usage_id);
+			}
+
+			if($transaction->cash_pid) {
+				db_query("DELETE FROM pos_api_expose_cash_log WHERE pid = '%d'", $transaction->cash_pid);
+			}
+
+			if($transaction->cc_pid) {
+				db_query("DELETE FROM pos_api_expose_credit_card_log WHERE pid = '%d'", $transaction->cc_pid);
+			}
+
+			if($transaction->check_pid) {
+				db_query("DELETE FROM pos_api_expose_check_log WHERE pid = '%d'", $transaction->check_pid);
+			}
+
+			if($transaction->mo_pid) {
+				db_query("DELETE FROM pos_api_expose_money_order_log WHERE pid = '%d'", $transaction->mo_pid);
+			}
+
+			db_query("DELETE FROM pos_api_expose_transaction_log WHERE pid = '%d'", $transaction->pid);
+		}
+	}
+}
