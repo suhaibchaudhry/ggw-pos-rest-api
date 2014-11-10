@@ -531,3 +531,8 @@ function _pos_api_transaction_details($transaction_id) {
 
   return false;
 }
+
+function pos_api_log_ticket_event($order_id, $uid, $message) {
+  $username = db_result(db_query("SELECT name FROM {users} WHERE uid = '%s'", $uid));
+  uc_order_comment_save($order_id, $uid, $message.l($username, 'user/'.$uid));
+}

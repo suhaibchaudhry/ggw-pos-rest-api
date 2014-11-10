@@ -417,6 +417,8 @@ function pos_api_expose_new_ticket() {
 
 			drupal_write_record('uc_orders', $order);
 			$lock_status = file_get_contents("http://www.general-goods.com/lock/index.php?ticket_id=".$order->order_id."&register_id=".$register_id."&op=acquire");
+
+			pos_api_log_ticket_event($order->order_id, $uid, 'New ticket created by employee: ');
 			pos_api_expose_respond(array('status' => true,
 										 'ticketId' => $order->order_id,
 										 'ticketStatus' =>$order->order_status,
