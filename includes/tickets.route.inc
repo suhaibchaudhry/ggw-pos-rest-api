@@ -1777,3 +1777,29 @@ function _pos_api_expose_clear_previous_payments($ticketId) {
 		}
 	}
 }
+
+function _pos_api_expose_clear_previous_payments_dp($ticketId) {
+	if($ticketId) {
+		$transactions = db_query("SELECT tl.pid, tl.credit_usage_id, tl.cash_pid, tl.rma_pid, tl.cc_pid, tl.check_pid, tl.mo_pid FROM pos_api_expose_transaction_log_dp tl WHERE tl.ticket_id = '%d'", $ticketId);
+
+		while($transaction = db_fetch_object($transactions)) {
+			if($transaction->cash_pid) {
+				db_query("DELETE FROM pos_api_expose_cash_log_dp WHERE pid = '%d'", $transaction->cash_pid);
+			}
+
+			if($transaction->cc_pid) {
+				db_query("DELETE FROM pos_api_expose_credit_card_log_dp WHERE pid = '%d'", $transaction->cc_pid);
+			}
+
+			if($transaction->check_pid) {
+				db_query("DELETE FROM pos_api_expose_check_log_dp WHERE pid = '%d'", $transaction->check_pid);
+			}
+
+			if($transaction->mo_pid) {
+				db_query("DELETE FROM pos_api_expose_money_order_log_dp WHERE pid = '%d'", $transaction->mo_pid);
+			}
+
+			db_query("DELETE FROM pos_api_expose_transaction_log_dp WHERE pid = '%d'", $transaction->pid);
+		}
+	}
+}
