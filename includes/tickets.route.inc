@@ -912,6 +912,8 @@ function pos_api_expose_ticket_swipe_checkout() {
 			if($zone == 1) {
 				$cc_log_table = 'pos_api_expose_credit_card_log_dp';
 				$transac_log_table = 'pos_api_expose_transaction_log_dp';
+
+				_pos_api_expose_clear_previous_payments_dp($ticketId);
 			} else {
 				$cc_log_table = 'pos_api_expose_credit_card_log';
 				$transac_log_table = 'pos_api_expose_transaction_log';
@@ -1016,6 +1018,8 @@ function pos_api_expose_ticket_partial_checkout() {
 				$mo_log_table = 'pos_api_expose_money_order_log_dp';
 				$cc_log_table = 'pos_api_expose_credit_card_log_dp';
 				$transac_log_table = 'pos_api_expose_transaction_log_dp';
+
+				_pos_api_expose_clear_previous_payments_dp($ticketId);
 			} else {
 				$cash_log_table = 'pos_api_expose_cash_log';
 				$check_log_table = 'pos_api_expose_check_log';
@@ -1221,6 +1225,8 @@ function pos_api_expose_ticket_cash_checkout() {
 				$mo_log_table = 'pos_api_expose_money_order_log_dp';
 				$cc_log_table = 'pos_api_expose_credit_card_log_dp';
 				$transac_log_table = 'pos_api_expose_transaction_log_dp';
+
+				_pos_api_expose_clear_previous_payments_dp($ticketId);
 			} else {
 				$cash_log_table = 'pos_api_expose_cash_log';
 				$check_log_table = 'pos_api_expose_check_log';
