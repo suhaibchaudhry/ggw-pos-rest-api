@@ -545,3 +545,8 @@ function pos_api_log_ticket_event($order_id, $uid, $message) {
   $username = db_result(db_query("SELECT name FROM {users} WHERE uid = '%s'", $uid));
   uc_order_comment_save($order_id, $uid, $message.l($username, 'user/'.$uid));
 }
+
+function pos_api_expose_lock_ticket($ticket_id) {
+  //Sometimes the client crashed before ticket can be closed, hence do it as as a precautionary measure.
+  db_query("UPDATE {uc_orders} SET order_status = '%s' WHERE order_id = '%d'", 'pos_completed', $ticket_id);
+}
