@@ -303,7 +303,7 @@ function pos_api_expose_customer_search($token) {
 					search ON search.vid = n.vid
 					WHERE n.type = 'profile' AND u.status = '1' AND u.uid IN (".$allowed_customer_roles.")
 					ORDER BY search.relevance DESC
-					LIMIT 0, 8";
+					LIMIT 0, 50";
 
 			$dataset = array();
 			$items = db_query($sql, $query, $query, $query, $query, $query, $query, $query);

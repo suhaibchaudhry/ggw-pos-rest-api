@@ -583,7 +583,8 @@ function pos_api_expose_ticket_search($token) {
 					FROM uc_orders uo
 					INNER JOIN uc_order_statuses os ON uo.order_status = os.order_status_id
 					WHERE uo.uid IN (".$ticket_customers.") OR uo.order_id LIKE '%s%%'
-					ORDER BY uo.modified DESC";
+					ORDER BY uo.modified DESC
+					LIMIT 0, 50";
 
 			$dataset = array();
 			$items = db_query($sql, $query, $query, $query, $query, $query, $query);
