@@ -1651,7 +1651,7 @@ function pos_ticket_invoice($order_id) {
 
 	$token = $_GET['token'];
 	$uid = _pos_api_expose_uid_from_token($token);
-	if($uid) {
+	if($uid || user_access('view mobile orders')) {
 		module_load_include('inc', 'uc_order', 'uc_order.admin');
 		$order = uc_order_load($order_id);
 		uc_order_invoice($order, 'print');
