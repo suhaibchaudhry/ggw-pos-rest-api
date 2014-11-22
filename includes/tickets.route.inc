@@ -1308,6 +1308,8 @@ function pos_api_expose_credit_cash_checkout() {
 		$request = json_decode($_POST['request']);
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
+			_pos_api_expose_trim_hanging_balances();
+
 			$cash = $request->cash;
 			$change = $request->change;
 			$cuid = $request->customer;
@@ -1441,6 +1443,8 @@ function pos_api_expose_credit_cash_checkout() {
 					}
 				}
 
+				_pos_api_expose_trim_hanging_balances();
+
 				pos_api_expose_respond(
 				array("status" => true,
 					  "message" => "Payment was made successfully.",
@@ -1452,6 +1456,22 @@ function pos_api_expose_credit_cash_checkout() {
 	}
 
 	pos_api_expose_respond($failed_response);
+}
+
+function _pos_api_expose_trim_hanging_balances() {
+	//Forgive any hanging balances under less than half a penny.
+	$hanging_settles = db_query("SELECT cu.cuid FROM user_term_credits_usages cu
+INNER JOIN (SELECT cs.cuid, SUM(cs.settlement_amount) AS samount FROM user_term_credits_settlements cs GROUP BY cs.cuid) settlements
+ON cu.cuid = settlements.cuid WHERE cu.settled = '0' AND (ABS(cu.credit_amount-settlements.samount) < '0.005')");
+	$cuids = array();
+	while($cuid = db_result($hanging_settles)) {
+		$cuids[] = $cuid;
+	}
+
+	if(count($cuids) > 0) {
+		$cuid_set = implode(', ', $cuids);
+		db_query("UPDATE user_term_credits_usages SET settled = '1' WHERE cuid IN (%s)", $cuid_set);
+	}
 }
 
 function _pos_api_expose_stock_adjustment($ticketId) {
