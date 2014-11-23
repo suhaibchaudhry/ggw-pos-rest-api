@@ -1308,11 +1308,13 @@ function pos_api_expose_credit_cash_checkout() {
 		$request = json_decode($_POST['request']);
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
-			_pos_api_expose_trim_hanging_balances();
-
 			$cash = $request->cash;
 			$change = $request->change;
 			$cuid = $request->customer;
+
+			if($cuid) {
+				_pos_api_expose_trim_hanging_balances($cuid);
+			}
 
 			$cash_value = $request->cash_val;
 
@@ -1443,7 +1445,7 @@ function pos_api_expose_credit_cash_checkout() {
 					}
 				}
 
-				_pos_api_expose_trim_hanging_balances();
+				_pos_api_expose_trim_hanging_balances($cuid);
 
 				pos_api_expose_respond(
 				array("status" => true,
@@ -1458,11 +1460,18 @@ function pos_api_expose_credit_cash_checkout() {
 	pos_api_expose_respond($failed_response);
 }
 
-function _pos_api_expose_trim_hanging_balances() {
+function _pos_api_expose_trim_hanging_balances($customer_uid = false) {
 	//Forgive any hanging balances under less than half a penny.
-	$hanging_settles = db_query("SELECT cu.cuid FROM user_term_credits_usages cu
-INNER JOIN (SELECT cs.cuid, SUM(cs.settlement_amount) AS samount FROM user_term_credits_settlements cs GROUP BY cs.cuid) settlements
-ON cu.cuid = settlements.cuid WHERE cu.settled = '0' AND (ABS(cu.credit_amount-settlements.samount) < '0.005')");
+	if($customer_uid) {
+		$hanging_settles = db_query("SELECT cu.cuid FROM user_term_credits_usages cu
+	INNER JOIN (SELECT cs.cuid, SUM(cs.settlement_amount) AS samount FROM user_term_credits_settlements cs GROUP BY cs.cuid) settlements
+	ON cu.cuid = settlements.cuid WHERE cu.uid = '%d' AND cu.settled = '0' AND (ABS(cu.credit_amount-settlements.samount) < '0.005')", $customer_uid);
+	} else {
+		$hanging_settles = db_query("SELECT cu.cuid FROM user_term_credits_usages cu
+	INNER JOIN (SELECT cs.cuid, SUM(cs.settlement_amount) AS samount FROM user_term_credits_settlements cs GROUP BY cs.cuid) settlements
+	ON cu.cuid = settlements.cuid WHERE cu.settled = '0' AND (ABS(cu.credit_amount-settlements.samount) < '0.005')");
+	}
+
 	$cuids = array();
 	while($cuid = db_result($hanging_settles)) {
 		$cuids[] = $cuid;
