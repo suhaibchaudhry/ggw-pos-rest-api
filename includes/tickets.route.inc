@@ -1569,8 +1569,8 @@ function pos_api_expose_rma_create_ticket() {
 				array("status" => true,
 					  "ticketId" => $order->order_id,
 					  "ticketStatus" => 'pos_return',
-					  "message" => "RMA ticket created."),
-					  "customer_uid" => $order->uid
+					  "message" => "RMA ticket created.",
+					  "customer_uid" => $order->uid)
 				, true);
 		}
 	}
