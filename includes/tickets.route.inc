@@ -827,7 +827,7 @@ function _pos_api_expose_create_return_entry($nid, $order_product_id, $qty_retur
 	db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $nid, (-1)*$qty_returned, $price, time());
 }
 
-function pos_api_expose_update_rma_refund() {
+/*function pos_api_expose_update_rma_refund() {
 	$failed_response = array(
 		'status' => false,
 		'error' => 'Could not update rma refund, please check network and try again.'
@@ -864,7 +864,7 @@ function pos_api_expose_update_rma_refund() {
 	}
 
 	pos_api_expose_respond($failed_response);
-}
+}*/
 
 function pos_api_expose_ticket_update_zone() {
 	$failed_response = array(

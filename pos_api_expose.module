@@ -127,14 +127,14 @@ function pos_api_expose_menu() {
 		'file' => 'includes/tickets.route.inc'
   );
 
-  $routers['pos-api/ticket/reprocess-rma'] = array(
+/*  $routers['pos-api/ticket/reprocess-rma'] = array(
     'title' => 'Update RMA Refunds',
     'description' => 'Update a refund amount on an rma ticket.',
     'page callback' => 'pos_api_expose_update_rma_refund',
     'access arguments' => array('access content'),
     'type' => MENU_CALLBACK,
     'file' => 'includes/tickets.route.inc'
-  );
+  );*/
 
   $routers['pos-api/ticket/process-rma'] = array(
     'title' => 'Process an RMA ticket.',
