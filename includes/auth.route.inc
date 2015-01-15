@@ -7,6 +7,7 @@ define("ROLE_FLOOR_MANAGER", 5);
 
 //Unprivileged Roles
 define("ROLE_FLOOR_AGENT", 4);
+define("ROLE_INVENTORY_MANAGER", 16);
 
 function pos_api_expose_auth() {
 	$failed_response = array(
@@ -29,6 +30,8 @@ function pos_api_expose_auth() {
 			$unprivileged = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid  = '".ROLE_FLOOR_AGENT."'", $user->uid));
 
 			$admin = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_DEVELOPER."')", $user->uid));
+
+			$inventory = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_INVENTORY_MANAGER."')", $uid));
 
 			$last_ticket = db_fetch_object(db_query("SELECT tl.ticket_id, o.order_status, o.uid, o.product_count FROM pos_api_expose_ticket_log tl INNER JOIN uc_orders o ON tl.ticket_id = o.order_id WHERE tl.uid = '%d' ORDER BY tl.timestamp DESC LIMIT 0,1", $user->uid));
 		}
@@ -68,6 +71,7 @@ function pos_api_expose_auth() {
 
 			$response['privileged'] = (bool)$privileged;
 			$response['admin'] = (bool)$admin;
+			$response['inventory'] = (bool)$inventory;
 			if($last_ticket) {
 				if(property_exists($last_ticket, 'ticket_id')) {
 					$last_ticket->ticket_id = (int)$last_ticket->ticket_id;
