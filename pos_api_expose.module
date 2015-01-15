@@ -551,6 +551,11 @@ function pos_api_expose_lock_ticket($ticket_id) {
   db_query("UPDATE {uc_orders} SET order_status = '%s' WHERE order_id = '%d'", 'pos_completed', $ticket_id);
 }
 
+function pos_api_expose_lock_rma_ticket($ticket_id) {
+  //Sometimes the client crashed before ticket can be closed, hence do it as as a precautionary measure.
+  db_query("UPDATE {uc_orders} SET order_status = '%s' WHERE order_id = '%d'", 'pos_return_closed', $ticket_id);
+}
+
 function pos_api_expose_trim_hanging_balances($customer_uid = false) {
   //Forgive any hanging balances under less than half a penny.
   if($customer_uid) {

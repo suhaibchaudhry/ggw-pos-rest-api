@@ -809,6 +809,8 @@ function pos_api_expose_process_rma() {
 
 				db_query("INSERT INTO {pos_api_expose_transaction_log} (uid, cuid, amount, rma_pid, ticket_id, register_id, `timestamp`) VALUES ('%d', '%d', '%s', '%d', '%d', '%s', '%s')", $uid, $customer_uid, $amount_returned, $rma_pid, $ticketId, $register_id, time());
 
+				pos_api_expose_lock_rma_ticket($ticketId);
+
 				pos_api_expose_respond(array('status' => true,
 											 'message' => $message), true);
 
