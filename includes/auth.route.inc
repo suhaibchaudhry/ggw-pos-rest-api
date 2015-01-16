@@ -31,7 +31,7 @@ function pos_api_expose_auth() {
 
 			$admin = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_ADMIN."', '".ROLE_DEVELOPER."')", $user->uid));
 
-			$inventory = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_INVENTORY_MANAGER."')", $uid));
+			$inventory = db_result(db_query("SELECT COUNT(*) FROM users_roles WHERE uid = '%d' AND rid IN ('".ROLE_INVENTORY_MANAGER."')", $user->uid));
 
 			$last_ticket = db_fetch_object(db_query("SELECT tl.ticket_id, o.order_status, o.uid, o.product_count FROM pos_api_expose_ticket_log tl INNER JOIN uc_orders o ON tl.ticket_id = o.order_id WHERE tl.uid = '%d' ORDER BY tl.timestamp DESC LIMIT 0,1", $user->uid));
 		}
