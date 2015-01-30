@@ -1357,14 +1357,35 @@ function pos_api_expose_credit_cash_checkout() {
 			$time = time();
 
 			$breakdown = "CASH|".$cash_value."\n";
-			if($post_dated) {
-				$breakdown .= "PCHECK|".$check_val."\n";
+
+			if($check) {
+				if($post_dated) {
+					$breakdown .= "PCHECK|".$check_val."\n";
+				} else {
+					$breakdown .= "CHECK|".$check_val."\n";
+				}
 			} else {
-				$breakdown .= "CHECK|".$check_val."\n";
+				$breakdown .= "CHECK|0.00"."\n";
 			}
-			$breakdown .= "RMA|".$rma_value."\n";
-			$breakdown .= "MO|".$mo_val."\n";
-			$breakdown .= "CC|".$credit_val."\n";
+
+			if($rma) {
+				$breakdown .= "RMA|".$rma_value."\n";
+			} else {
+				$breakdown .= "RMA|0.00"."\n";
+			}
+
+			if($mo) {
+				$breakdown .= "MO|".$mo_val."\n";
+			} else {
+				$breakdown .= "MO|0.00"."\n";
+			}
+
+			if($credit) {
+				$breakdown .= "CC|".$credit_val."\n";
+			} else {
+				$breakdown .= "CC|0.00"."\n";
+			}
+
 			$breakdown .= "CHANGE|".$change;
 
 			$breakdown_set = false;
