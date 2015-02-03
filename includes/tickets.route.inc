@@ -1771,7 +1771,7 @@ function pos_api_expose_unlock_ticket_event() {
 
 			$settled = db_result(db_query("SELECT COUNT(se.sid) FROM user_term_credits_settlements se INNER JOIN user_term_credits_usages cu ON se.cuid = cu.cuid WHERE cu.order_id = '%d'", $ticketId));
 
-			$allow_recheckout = ((time()-$create_date) < 1209600) && ($settled == "0");
+			$allow_recheckout = ((time()-$create_date) < 5184000) && ($settled == "0");
 
 			pos_api_expose_respond(array('status' => true,
 										 'message' => 'successfully reported ticket unlock event.', 'recheckout' => $allow_recheckout), true);
