@@ -626,6 +626,12 @@ function pos_api_expose_ticket_add_product() {
 
 			if($cuid > 0) {
 				$price = _pos_api_get_customer_price($cuid, $order_product->nid);
+				$vid = db_result(db_query("SELECT vid FROM node WHERE nid = '%d'", $order_product->nid));
+				$sale_object = _pos_api_expose_get_sale_object($vid);
+				if(!empty($sale_object->field_sale_price_value)) {
+					$price = $sale_object->field_sale_price_value;
+				}
+
 				if($price) {
 					$order_product->price = $price;
 				} else {

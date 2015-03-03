@@ -16,16 +16,6 @@ function _pos_api_expose_load_special_prices($vid, $sale_object) {
 	return $prices;
 }
 
-function _pos_api_expose_check_role_price($sale_price, $level_price, $rid, $cmp_rid, &$price) {
-	if($rid == $cmp_rid) {
-		if(!empty($level_price)) {
-			$price = $level_price;
-		} else if(!empty($sale_price)) {
-			$price = $sale_price;
-		}
-	}
-}
-
 function _pos_api_expose_get_category($nid) {
 	return db_result(db_query("SELECT gsrt.invoice_category FROM {term_node} tn INNER JOIN {ggw_state_reporting_terms} gsrt ON tn.tid = gsrt.vid WHERE tn.nid = '%d'", $nid));
 }
@@ -84,23 +74,6 @@ function _pos_api_expose_map_product_datum($item, $special_price = true, $ticket
 	$product['unhistoric'] = $unhistoric;
 
 	return $product;
-}
-
-function _pos_api_expose_get_sale_object($vid) {
-  return db_fetch_object(
-  			db_query("SELECT ctp.field_sale_period_value,
-  							 ctp.field_sale_period_value2,
-  							 ctp.field_sale_max_units_value,
-  							 ctp.field_sale_price_value,
-  							 ctp.field_level_1_price_value,
-  							 ctp.field_level_2_price_value,
-  							 ctp.field_level_4_price_value,
-  							 ctp.field_level_3_price_value
-  					  FROM content_type_product ctp
-  					  WHERE ctp.vid = '%d' AND ctp.field_sale_period_value < NOW() AND ctp.field_sale_period_value2 > NOW()
-  					  ORDER BY ctp.vid DESC", $vid
-  			)
-  		  );
 }
 
 function _pos_api_expose_map_product_rma($item, $unhistoric = false) {
