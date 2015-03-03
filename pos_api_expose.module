@@ -595,7 +595,7 @@ function _pos_api_expose_get_sale_object($vid) {
                 )
             );
 
-  if(_pos_api_expose_product_items_sold($vid) > $product->field_sale_max_units_value) {
+  if(is_numeric($product->field_sale_max_units_value) && _pos_api_expose_product_items_sold($vid) > $product->field_sale_max_units_value) {
     return new stdClass();
   } else {
     return $product;
