@@ -580,20 +580,26 @@ function pos_api_expose_trim_hanging_balances($customer_uid = false) {
 }
 
 function _pos_api_expose_get_sale_object($vid) {
-  return db_fetch_object(
-            db_query("SELECT ctp.field_sale_period_value,
-                     ctp.field_sale_period_value2,
-                     ctp.field_sale_max_units_value,
-                     ctp.field_sale_price_value,
-                     ctp.field_level_1_price_value,
-                     ctp.field_level_2_price_value,
-                     ctp.field_level_4_price_value,
-                     ctp.field_level_3_price_value
-                  FROM content_type_product ctp
-                  WHERE ctp.vid = '%d' AND ctp.field_sale_period_value < NOW() AND ctp.field_sale_period_value2 > NOW()
-                  ORDER BY ctp.vid DESC", $vid
-            )
-        );
+  $product = db_fetch_object(
+                db_query("SELECT ctp.field_sale_period_value,
+                         ctp.field_sale_period_value2,
+                         ctp.field_sale_max_units_value,
+                         ctp.field_sale_price_value,
+                         ctp.field_level_1_price_value,
+                         ctp.field_level_2_price_value,
+                         ctp.field_level_4_price_value,
+                         ctp.field_level_3_price_value
+                      FROM content_type_product ctp
+                      WHERE ctp.vid = '%d' AND ctp.field_sale_period_value < NOW() AND ctp.field_sale_period_value2 > NOW()
+                      ORDER BY ctp.vid DESC", $vid
+                )
+            );
+
+  if(_pos_api_expose_product_items_sold($vid) > $product->field_sale_max_units_value) {
+    return new stdClass();
+  } else {
+    return $product;
+  }
 }
 
 function _pos_api_expose_check_role_price($sale_price, $level_price, $rid, $cmp_rid, &$price) {
@@ -604,4 +610,8 @@ function _pos_api_expose_check_role_price($sale_price, $level_price, $rid, $cmp_
       $price = $sale_price;
     }
   }
+}
+
+function _pos_api_expose_product_items_sold($vid) {
+   return db_result(db_query("SELECT SUM(stock_adjustment) AS units_sold FROM pos_out_stock_management s INNER JOIN content_type_product c ON s.product_nid = c.nid WHERE c.nid = '%d' AND c.field_sale_period_value < FROM_UNIXTIME(s.timestamp) AND  c.field_sale_period_value2 > FROM_UNIXTIME(s.timestamp)", $vid));
 }
