@@ -4,10 +4,10 @@ function _pos_api_expose_load_special_prices($vid, $sale_object) {
 	$role_prices = db_query("SELECT rid, price FROM {uc_price_per_role_prices} WHERE vid = '%d'", $vid);
 	while($role_price = db_fetch_object($role_prices)) {
 		
-		_pos_api_expose_check_role_price($sale_object->sell_price, $sale_object->field_level_1_price_value, $role_price->rid, "12", $role_price->price);
-		_pos_api_expose_check_role_price($sale_object->sell_price, $sale_object->field_level_2_price_value, $role_price->rid, "13", $role_price->price);
-		_pos_api_expose_check_role_price($sale_object->sell_price, $sale_object->field_level_3_price_value, $role_price->rid, "14", $role_price->price);
-		_pos_api_expose_check_role_price($sale_object->sell_price, $sale_object->field_level_4_price_value, $role_price->rid, "15", $role_price->price);
+		_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_1_price_value, $role_price->rid, "12", $role_price->price);
+		_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_2_price_value, $role_price->rid, "13", $role_price->price);
+		_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_3_price_value, $role_price->rid, "14", $role_price->price);
+		_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_4_price_value, $role_price->rid, "15", $role_price->price);
 
 
 		$prices[] = array('role' => $role_price->rid, 'price' => $role_price->price);
@@ -64,8 +64,8 @@ function _pos_api_expose_map_product_datum($item, $special_price = true, $ticket
 
 	$sale_object = _pos_api_expose_get_sale_object($item->vid);
 
-	if(!empty($sale_object->sell_price)) {
-		$product['sell_price'] = $sale_object->sell_price;
+	if(!empty($sale_object->field_sale_price_value)) {
+		$product['sell_price'] = $sale_object->field_sale_price_value;
 	}
 
 	if($special_price) {
