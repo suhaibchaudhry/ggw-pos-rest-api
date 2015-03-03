@@ -625,17 +625,17 @@ function pos_api_expose_ticket_add_product() {
 			$order_product->model = $request->sku;
 
 			if($cuid > 0) {
-				$price = _pos_api_get_customer_price($cuid, $order_product->nid);
 				$vid = db_result(db_query("SELECT vid FROM node WHERE nid = '%d'", $order_product->nid));
 				$sale_object = _pos_api_expose_get_sale_object($vid);
-				if(!empty($sale_object->field_sale_price_value)) {
-					$price = $sale_object->field_sale_price_value;
-				}
-
+				$price = _pos_api_get_customer_price($cuid, $order_product->nid, $sale_object);
 				if($price) {
 					$order_product->price = $price;
 				} else {
-					$order_product->price = $request->price;
+					if(!empty($sale_object->field_sale_price_value)) {
+						$order_product->price = $sale_object->field_sale_price_value;
+					} else {
+						$order_product->price = $request->price;
+					}
 				}
 			} else {
 				$order_product->price = $request->price;
@@ -665,10 +665,22 @@ function pos_api_expose_ticket_add_product() {
 	pos_api_expose_respond($failed_response);
 }
 
-function _pos_api_get_customer_price($customer_uid, $nid) {
-	return db_result(db_query("SELECT up.price FROM users_roles ur
+function _pos_api_get_customer_price($customer_uid, $nid, $sale_object) {
+	$price = db_result(db_query("SELECT up.price FROM users_roles ur
 	 INNER JOIN uc_price_per_role_prices up ON ur.rid = up.rid
 	 WHERE ur.uid = '%d' AND up.nid = '%d'", $customer_uid, $nid));
+
+	if(!empty($price)) {
+		$roles = db_query("SELECT ur.rid FROM users_roles ur WHERE ur.uid = '%d'", $customer_uid);
+		while($role = db_fetch_object($roles)) {
+			_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_1_price_value, $role->rid, "12", $price);
+			_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_2_price_value, $role->rid, "13", $price);
+			_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_3_price_value, $role->rid, "14", $price);
+			_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_4_price_value, $role->rid, "15", $price);
+		}
+	}
+	
+	return $price;
 }
 
 function pos_api_expose_ticket_remove_product() {
