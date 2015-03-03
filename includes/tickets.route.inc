@@ -453,7 +453,7 @@ function pos_api_expose_ticket_update_customer() {
 
 					while($role = db_fetch_object($rids)) {
 						$rid = $role->rid;
-						$nodes = db_query("SELECT uop.order_product_id, upprp.price FROM {uc_order_products} uop 
+						$nodes = db_query("SELECT uop.nid, uop.order_product_id, upprp.price FROM {uc_order_products} uop 
 							INNER JOIN {uc_price_per_role_prices} upprp on uop.nid = upprp.nid
 							WHERE uop.order_id = '%d' AND upprp.rid = '%d'", $ticketId, $rid);
 
@@ -463,6 +463,15 @@ function pos_api_expose_ticket_update_customer() {
 								$override_attempts++;
 								$count = db_result(db_query("SELECT COUNT(*) FROM pos_api_expose_manager_override_log WHERE product_nid = '%d'", $node->order_product_id));
 								if($count == 0) {
+									$vid = db_result(db_query("SELECT vid FROM node WHERE nid = '%d'", $node->nid));
+									$sale_object = _pos_api_expose_get_sale_object($vid);
+									if(!empty($sale_object->field_sale_price_value)) {
+                       					$node->price = $sale_object->field_sale_price_value;
+               						}
+									_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_1_price_value, $rid, "12", $node->price);
+									_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_2_price_value, $rid, "13", $node->price);
+									_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_3_price_value, $rid, "14", $node->price);
+									_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_4_price_value, $rid, "15", $node->price);
 									db_query("UPDATE {uc_order_products} SET price = '%s' WHERE order_id = '%d' AND order_product_id = '%d'", $node->price, $ticketId, $node->order_product_id);
 									$i++;
 								}
@@ -671,7 +680,12 @@ function _pos_api_get_customer_price($customer_uid, $nid, $sale_object) {
 	 WHERE ur.uid = '%d' AND up.nid = '%d'", $customer_uid, $nid));
 
 	if(!empty($price)) {
+		if(!empty($sale_object->field_sale_price_value)) {
+			$price = $sale_object->field_sale_price_value;
+		}
+
 		$roles = db_query("SELECT ur.rid FROM users_roles ur WHERE ur.uid = '%d'", $customer_uid);
+
 		while($role = db_fetch_object($roles)) {
 			_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_1_price_value, $role->rid, "12", $price);
 			_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_2_price_value, $role->rid, "13", $price);
