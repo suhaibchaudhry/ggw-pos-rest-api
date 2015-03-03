@@ -440,6 +440,7 @@ function pos_api_expose_ticket_update_customer() {
 		$request = json_decode($_POST['request']);
 		$ticketId = $request->ticketId;
 		$customerUid = $request->customerUid;
+		$product_pricing = array();
 
 		$uid = _pos_api_expose_uid_from_token($request->token);
 		if($uid) {
@@ -473,6 +474,7 @@ function pos_api_expose_ticket_update_customer() {
 									_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_3_price_value, $rid, "14", $node->price);
 									_pos_api_expose_check_role_price($sale_object->field_sale_price_value, $sale_object->field_level_4_price_value, $rid, "15", $node->price);
 									db_query("UPDATE {uc_order_products} SET price = '%s' WHERE order_id = '%d' AND order_product_id = '%d'", $node->price, $ticketId, $node->order_product_id);
+									$product_pricing[$node->order_product_id] = $node->price;
 									$i++;
 								}
 							}
@@ -496,6 +498,7 @@ function pos_api_expose_ticket_update_customer() {
                				}
 
 							db_query("UPDATE {uc_order_products} SET price = '%s' WHERE order_id = '%d' AND order_product_id = '%d'", $node->sell_price, $ticketId, $node->order_product_id);
+							$product_pricing[$node->order_product_id] = $node->sell_price;
 						}
 					}
 				}
@@ -503,7 +506,7 @@ function pos_api_expose_ticket_update_customer() {
 				pos_api_expose_ticket_update_total_on_server($ticketId);
 			}
 
-			pos_api_expose_respond(array('status' => true, 'message' => 'Customer id has been set.'), true);
+			pos_api_expose_respond(array('status' => true, 'message' => 'Customer id has been set.', 'new_pricing' => $product_pricing), true);
 		}
 	}
 
