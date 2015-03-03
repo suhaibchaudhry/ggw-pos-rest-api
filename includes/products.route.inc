@@ -52,7 +52,7 @@ function _pos_api_expose_map_product_datum($item, $special_price = true, $ticket
 
 	$sale_object = _pos_api_expose_get_sale_object($item->vid);
 
-	if(!empty($sale_object->field_sale_price_value)) {
+	if(empty($item->order_product_id) && !empty($sale_object->field_sale_price_value)) {
 		$product['sell_price'] = $sale_object->field_sale_price_value;
 	}
 
