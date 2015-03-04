@@ -606,12 +606,16 @@ function _pos_api_expose_check_role_price($sale_price, $level_price, $rid, $cmp_
   if($rid == $cmp_rid) {
     if(!empty($level_price)) {
       $price = $level_price;
+      return true;
     } else if(!empty($sale_price)) {
       $price = $sale_price;
+      return true;
     }
   }
+
+  return false;
 }
 
 function _pos_api_expose_product_items_sold($vid) {
-   return db_result(db_query("SELECT SUM(stock_adjustment) AS units_sold FROM pos_out_stock_management s INNER JOIN content_type_product c ON s.product_nid = c.nid WHERE c.nid = '%d' AND c.field_sale_period_value < FROM_UNIXTIME(s.timestamp) AND  c.field_sale_period_value2 > FROM_UNIXTIME(s.timestamp)", $vid));
+   return db_result(db_query("SELECT SUM(stock_adjustment) AS units_sold FROM pos_out_stock_management s INNER JOIN content_type_product c ON s.product_nid = c.nid WHERE c.vid = '%d' AND c.field_sale_period_value < FROM_UNIXTIME(s.timestamp) AND c.field_sale_period_value2 > FROM_UNIXTIME(s.timestamp)", $vid));
 }
