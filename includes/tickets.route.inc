@@ -1823,8 +1823,10 @@ function pos_api_expose_unlock_ticket_event() {
 }
 
 function _pos_api_expose_clear_previous_payments($ticketId) {
+	$timestamp = false;
 	if($ticketId) {
-		$transactions = db_query("SELECT tl.pid, tl.credit_usage_id, tl.cash_pid, tl.rma_pid, tl.cc_pid, tl.check_pid, tl.mo_pid FROM pos_api_expose_transaction_log tl WHERE tl.ticket_id = '%d'", $ticketId);
+		$timestamp = time();
+		$transactions = db_query("SELECT tl.pid, tl.credit_usage_id, tl.cash_pid, tl.rma_pid, tl.cc_pid, tl.check_pid, tl.mo_pid, tl.timestamp FROM pos_api_expose_transaction_log tl WHERE tl.ticket_id = '%d'", $ticketId);
 
 		while($transaction = db_fetch_object($transactions)) {
 			if($transaction->rma_pid) {
@@ -1852,13 +1854,19 @@ function _pos_api_expose_clear_previous_payments($ticketId) {
 			}
 
 			db_query("DELETE FROM pos_api_expose_transaction_log WHERE pid = '%d'", $transaction->pid);
+
+			$timestamp = $transaction->timestamp;
 		}
 	}
+
+	return $timestamp;
 }
 
 function _pos_api_expose_clear_previous_payments_dp($ticketId) {
+	$timestamp = false;
 	if($ticketId) {
-		$transactions = db_query("SELECT tl.pid, tl.credit_usage_id, tl.cash_pid, tl.rma_pid, tl.cc_pid, tl.check_pid, tl.mo_pid FROM pos_api_expose_transaction_log_dp tl WHERE tl.ticket_id = '%d'", $ticketId);
+		$timestamp = time();
+		$transactions = db_query("SELECT tl.pid, tl.credit_usage_id, tl.cash_pid, tl.rma_pid, tl.cc_pid, tl.check_pid, tl.mo_pid, tl.timestamp FROM pos_api_expose_transaction_log_dp tl WHERE tl.ticket_id = '%d'", $ticketId);
 
 		while($transaction = db_fetch_object($transactions)) {
 			if($transaction->cash_pid) {
@@ -1878,6 +1886,10 @@ function _pos_api_expose_clear_previous_payments_dp($ticketId) {
 			}
 
 			db_query("DELETE FROM pos_api_expose_transaction_log_dp WHERE pid = '%d'", $transaction->pid);
+
+			$timestamp = $transaction->timestamp;
 		}
 	}
+
+	return $timestamp;
 }
