@@ -208,15 +208,6 @@ function pos_api_expose_menu() {
     'file' => 'includes/tickets.route.inc'
   );
 
-  $routers['pos-api/ticket/rma-checkout'] = array(
-    'title' => 'Customer RMA Checkout',
-    'description' => 'Checkout customer RMA ticket.',
-    'page callback' => 'pos_api_expose_rma_refund',
-    'access arguments' => array('access content'),
-    'type' => MENU_CALLBACK,
-    'file' => 'includes/tickets.route.inc'
-  );
-
   $routers['pos-api/ticket/create-rma-ticket'] = array(
     'title' => 'Create RMA Ticket',
     'description' => 'Checkout customer RMA ticket.',
