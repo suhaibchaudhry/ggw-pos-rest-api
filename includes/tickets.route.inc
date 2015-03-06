@@ -871,45 +871,6 @@ function _pos_api_expose_create_return_entry($nid, $order_product_id, $qty_retur
 	db_query("INSERT INTO {pos_out_stock_management} (product_nid, stock_adjustment, unit_price, `timestamp`) VALUES ('%d', '%d', '%s', '%s')", $nid, (-1)*$qty_returned, $price, time());
 }
 
-/*function pos_api_expose_update_rma_refund() {
-	$failed_response = array(
-		'status' => false,
-		'error' => 'Could not update rma refund, please check network and try again.'
-	);
-
-	if(array_key_exists('request', $_POST)) {
-		$request = json_decode($_POST['request']);
-		$ticketId = $request->ticketId;
-		$customer_uid = $request->customer_uid;
-
-		$uid = _pos_api_expose_uid_from_token($request->token);
-		if($uid) {
-			if($ticketId) {
-				pos_api_expose_ticket_update_total_on_server($ticketId);
-				$subtotal = db_result(db_query("SELECT (-1)*(uo.order_total-IFNULL(t.tax, 0)) AS subtotal FROM uc_orders uo
-					LEFT JOIN (SELECT order_id, SUM(amount) AS tax FROM uc_order_line_items GROUP BY order_id) t
-					ON uo.order_id = t.order_id WHERE uo.order_id = '%d'", $ticketId));
-
-				if($subtotal < 0) {
-					$time = time();
-
-					db_query("DELETE FROM user_term_credits_usages WHERE order_id = '%d'", $ticketId);
-					db_query("INSERT INTO user_term_credits_usages (uid, order_id, credit_amount, consumption_date, due_date)
-						VALUES ('%d', '%d', '%s', '%s', '%s')", $customer_uid, $ticketId, $subtotal, $time, $time);
-
-					pos_api_expose_respond(array('status' => true,
-											 'message' => 'RMA ticket was re-processed.'), true);
-				} else {
-					pos_api_expose_respond(array('status' => true,
-											 'message' => 'RMA tickets must amount to more than $0.00 to be re-processed.'), true);
-				}
-			}
-		}
-	}
-
-	pos_api_expose_respond($failed_response);
-}*/
-
 function pos_api_expose_ticket_update_zone() {
 	$failed_response = array(
 		'status' => false,
