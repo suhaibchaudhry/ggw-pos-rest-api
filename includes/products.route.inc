@@ -35,7 +35,8 @@ function _pos_api_expose_map_product_datum($item, $special_price = true, $ticket
 		'sell_price' => $item->sell_price,
 		'name' => trim($item->title),
 		'image' => imagecache_create_url('pos_client_search', $item->filepath),
-		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath)
+		'thumbnail' => imagecache_create_url('uc_thumbnail', $item->filepath),
+		'cost' => $item->cost
 	);
 
 	if($item->order_product_id) {
